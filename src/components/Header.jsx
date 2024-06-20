@@ -53,14 +53,7 @@ export default function Header({
     }
   };
 
-  const handleBookmarkSave = () => {
-    localStorage.setItem("bookmark", currentPage);
-    toast.success("تم حفظ العلامة بنجاح!", {
-      autoClose: 3000,
-      closeOnClick: true,
-    });
-    closeMenu();
-  };
+
 
   const handleBookmarkGoTo = () => {
     const savedBookmark = localStorage.getItem("bookmark");
