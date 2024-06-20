@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 import { VscSearch } from "react-icons/vsc";
 import { GoPaperAirplane } from "react-icons/go";
 import { FiMenu, FiX } from "react-icons/fi";
@@ -7,20 +8,31 @@ import { PiBooksFill } from "react-icons/pi";
 import { IoPersonCircleSharp } from "react-icons/io5";
 import { FaMosque } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import "../App.css";
+const Notification = ({ message, type }) => (
+  <div
+    className={`fixed top-5 right-5 p-4 rounded-md shadow-lg transition-transform transform ${
+      type === "loading"
+        ? "bg-yellow-300 text-black"
+        : type === "success"
+        ? "bg-green-500 text-white"
+        : "bg-red-500 text-white"
+    }`}
+  >
+    {message}
+  </div>
+);
 
 export default function Header({
   isContentActive,
   onPageSearch,
-  currentPage,
   toggleFahrasVisibility,
   toggleSearchVisibility,
 }) {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isSpeedSearchMenuOpen, setSpeedSearchMenuOpen] = useState(false);
   const [pageNumber, setPageNumber] = useState("");
+  const [notification, setNotification] = useState(null);
 
   const toggleMenu = () => setMenuOpen(!isMenuOpen);
   const toggleSpeedSearchMenu = () =>
@@ -29,31 +41,30 @@ export default function Header({
   const closeMenu = () => setMenuOpen(false);
   const closeSpeedSearchMenu = () => setSpeedSearchMenuOpen(false);
 
+  const showNotification = (message, type = "info") => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+  };
+
   const handlePageSearch = () => {
     const page = parseInt(pageNumber, 10);
     if (page >= 1 && page <= 604) {
-      const loadingToastId = toast.loading("جاري البحث عن الصفحة...", {
-        closeOnClick: true,
-      });
+      showNotification(`جاري البحث عن الصفحة ${page}...`, "loading");
+
       setTimeout(() => {
-        toast.update(loadingToastId, {
-          render: "تم العثور على الصفحة بنجاح!",
-          type: "success",
-          isLoading: false,
-          autoClose: 3000,
-          closeOnClick: true,
-        });
+        showNotification(`تم العثور على الصفحة ${page} بنجاح!`, "success");
         onPageSearch(page);
         closeMenu();
       }, 300);
     } else {
-      toast.error("رقم الصفحة غير صالح. الرجاء إدخال رقم بين 1 و 604.", {
-        closeOnClick: true,
-      });
+      showNotification(
+        "رقم الصفحة غير صالح. الرجاء إدخال رقم بين 1 و 604.",
+        "error"
+      );
     }
   };
-
-
 
   const handleBookmarkGoTo = () => {
     const savedBookmark = localStorage.getItem("bookmark");
@@ -62,10 +73,7 @@ export default function Header({
       onPageSearch(page);
       closeMenu();
     } else {
-      toast.error("لم يتم حفظ أي علامة.", {
-        autoClose: 3000,
-        closeOnClick: true,
-      });
+      showNotification("لم يتم حفظ أي علامة.", "error");
     }
   };
 
@@ -89,17 +97,14 @@ export default function Header({
 
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      {notification && (
+        <div className="fixed top-0 right-0 z-50">
+          <Notification
+            message={notification.message}
+            type={notification.type}
+          />
+        </div>
+      )}
       <header
         className={`w-full py-5 flex justify-between gap-5 px-8 bg-gradient-to-r from-green-500 via-green-600 to-green-700 absolute text-white items-center z-10 transition-all duration-300 ${
           isContentActive ? "right-[-100%]" : "right-0"
@@ -212,3 +217,13 @@ export default function Header({
     </>
   );
 }
+Header.propTypes = {
+  isContentActive: PropTypes.bool.isRequired,
+  onPageSearch: PropTypes.func.isRequired,
+  toggleFahrasVisibility: PropTypes.func.isRequired,
+  toggleSearchVisibility: PropTypes.func.isRequired,
+};
+Notification.propTypes = {
+  message: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(["loading", "success", "error"]).isRequired,
+};

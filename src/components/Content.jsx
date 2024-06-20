@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
+import PropTypes from "prop-types";
 import surahMap from "../data/Surah";
 import imageSources from "../data/Print";
 import gsap from "gsap";
@@ -11,7 +12,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Content({
-  isContentActive,
   toggleContent,
   onPageChange,
   onPageSearch,
@@ -24,8 +24,7 @@ export default function Content({
   const [imageSourceIndex, setImageSourceIndex] = useState(0);
   const [isButtonMoved, setIsButtonMoved] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [backgroundColor, setBackgroundColor] = useState("#fcd15ce0");
-  const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [backgroundColor, setBackgroundColor] = useState("#fcd15c");
   const totalImages = 604;
   const preloadCountMobile = 2;
   const preloadCountDesktop = 4;
@@ -96,7 +95,19 @@ export default function Content({
   useEffect(() => {
     const savedBackgroundColor = localStorage.getItem("backgroundColor");
     if (savedBackgroundColor) {
-      setBackgroundColor(savedBackgroundColor);
+      if (/^#[0-9A-F]{6}$/i.test(savedBackgroundColor)) {
+        setBackgroundColor(savedBackgroundColor);
+      } else {
+        toast.error("لون الخلفية غير صالح، تم تعيين اللون الافتراضي.", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
     }
   }, []);
 
@@ -194,16 +205,28 @@ export default function Content({
   };
 
   const handleSaveColorChange = () => {
-    localStorage.setItem("backgroundColor", backgroundColor);
-    toast.success("تم حفظ التغيير", {
-      position: "top-right",
-      autoClose: 2000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
+    if (/^#[0-9A-F]{6}$/i.test(backgroundColor)) {
+      localStorage.setItem("backgroundColor", backgroundColor);
+      toast.success("تم حفظ التغيير", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } else {
+      toast.error("لون الخلفية غير صالح، يرجى إدخال لون صالح.", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
   };
 
   return (
@@ -330,3 +353,11 @@ export default function Content({
     </div>
   );
 }
+Content.propTypes = {
+  isContentActive: PropTypes.bool.isRequired,
+  toggleContent: PropTypes.func.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+  onPageSearch: PropTypes.func.isRequired,
+  currentPage: PropTypes.number.isRequired,
+  onSaveBookmark: PropTypes.func.isRequired,
+};

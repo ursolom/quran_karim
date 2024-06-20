@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { CiSearch } from "react-icons/ci";
 import { TiArrowBack } from "react-icons/ti";
 import QuranSearch from "../data/QuranSearch";
 import surahMap from "../data/Surah";
 import PageData from "../data/PageData";
+import PropTypes from "prop-types";
 
 const wordOccurrences = (text, word) => {
   const regex = new RegExp(word, "gi");
@@ -174,5 +175,8 @@ const Search = ({ onVerseClick, onHide }) => {
     </div>
   );
 };
-
+Search.propTypes = {
+  onVerseClick: PropTypes.func.isRequired,
+  onHide: PropTypes.func.isRequired,
+};
 export default Search;

@@ -1,9 +1,10 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 import surahMap from "../data/Surah";
 import { CiSearch } from "react-icons/ci";
 import { TiArrowBack } from "react-icons/ti";
 
-export default function Fahras({ onSurahClick, onGoBack }) {
+const Fahras = ({ onSurahClick, onGoBack }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearch = (event) => {
@@ -85,4 +86,11 @@ export default function Fahras({ onSurahClick, onGoBack }) {
       </div>
     </div>
   );
-}
+};
+
+Fahras.propTypes = {
+  onSurahClick: PropTypes.func.isRequired,
+  onGoBack: PropTypes.func.isRequired,
+};
+
+export default Fahras;

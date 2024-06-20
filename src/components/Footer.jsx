@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 import { MdPlayCircle } from "react-icons/md";
 import { FaStopCircle } from "react-icons/fa";
 import { RxLapTimer } from "react-icons/rx";
@@ -351,7 +352,8 @@ export default function Footer({ isContentActive, currentPage, onPageChange }) {
               {playMode === "surah"
                 ? sheikhs.map((sheikh) => (
                     <button
-                      key={sheikh.id}
+                      key={sheikh.id} 
+
                       onClick={() => selectSheikh(sheikh)}
                       className={`${
                         selectedSheikh.id === sheikh.id
@@ -399,7 +401,10 @@ export default function Footer({ isContentActive, currentPage, onPageChange }) {
                   ))}
             </div>
             <div className="w-full mb-4 flex gap-1 flex-col justify-center items-center  text-white">
-              <h3 className="text-center text-[20px]"> اختــر وضـع التشغيــل</h3>
+              <h3 className="text-center text-[20px]">
+                {" "}
+                اختــر وضـع التشغيــل
+              </h3>
               <div className="w-full flex flex-col justify-center gap-2 items-center">
                 <span className="w-20 h-1 bg-white relative rounded-xl"></span>
                 <span className="w-14 h-1 bg-white relative rounded-xl"></span>
@@ -465,3 +470,8 @@ export default function Footer({ isContentActive, currentPage, onPageChange }) {
     </>
   );
 }
+Footer.propTypes = {
+  isContentActive: PropTypes.bool.isRequired,
+  currentPage: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+};

@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Prayer from "./pages/Prayer";
 import Profiler from "./pages/Profiler";
-import MouseAnimation from "./components/MouseAnimation"; // استيراد كود الرسوم المتحركة للفأرة
+import MouseAnimation from "./components/MouseAnimation";
 import { AiFillSound } from "react-icons/ai";
 import { FaVolumeMute } from "react-icons/fa";
 import axios from "axios";
@@ -156,7 +156,7 @@ const App = () => {
 
             setTimeout(() => {
               document.getElementById("mute-button").style.display = "none";
-            }, 2 * 60 * 1000); 
+            }, 2 * 60 * 1000);
           }
         }
 
@@ -168,7 +168,7 @@ const App = () => {
         );
 
         if (
-          prayer.name !== "الشروق" &&
+          ["الفجر", "الظهر", "العصر", "العشاء"].includes(prayer.name) &&
           now.getHours() === fifteenMinutesAfter.getHours() &&
           now.getMinutes() === fifteenMinutesAfter.getMinutes() &&
           now.getSeconds() === 0
