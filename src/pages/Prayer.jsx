@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { IoLocation } from "react-icons/io5";
 import { BsSunFill, BsMoonStarsFill } from "react-icons/bs";
 import { PiSunHorizonFill } from "react-icons/pi";
@@ -7,6 +8,7 @@ import { WiStars } from "react-icons/wi";
 import { Link } from "react-router-dom";
 import { TiArrowBack } from "react-icons/ti";
 import cityData from "../data/City";
+import Mosque from "../../public/img_site/Prayer/bg_mosque.jpg";
 
 const defaultCity = localStorage.getItem("selectedCity") || "cairo";
 
@@ -37,7 +39,7 @@ const prayerIconColors = {
   العشاء: "#8b5cf6",
 };
 
-export default function Prayer({ prayerTimes, selectedCity, onCityChange }) {
+const Prayer = ({ prayerTimes, selectedCity, onCityChange }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [nextPrayer, setNextPrayer] = useState(null);
   const [timeLeft, setTimeLeft] = useState("");
@@ -118,7 +120,7 @@ export default function Prayer({ prayerTimes, selectedCity, onCityChange }) {
       <div className="relative w-full h-[60vh] flex justify-center items-center">
         <span className="absolute w-full h-full -z-10"></span>
         <img
-          src="../../public/img_site/Prayer/bg_mosque.jpg"
+          src={Mosque}
           className="select-none top-0 left-0 z-0 w-full h-full object-cover absolute"
           style={{
             maskImage: `linear-gradient(black 90%, transparent 104%)`,
@@ -128,11 +130,9 @@ export default function Prayer({ prayerTimes, selectedCity, onCityChange }) {
         />
         {nextPrayer && (
           <div className="bg-neutral-500 bg-clip-padding backdrop-filter backdrop-blur bg-opacity-10 backdrop-saturate-100 backdrop-contrast-100 md:py-10 md:px-52 px-16 py-5 text-white z-10 rounded-lg flex flex-col gap-4 justify-center items-center">
-            <p className="prayer-name text-[20px]">
-              {prayerNamesArabic[nextPrayer.name]}
-            </p>
-            <p className="prayer-clock">{formatTime(nextPrayer.time)}</p>
-            <p className="">{timeLeft}</p>
+            <p className="text-[20px]">{prayerNamesArabic[nextPrayer.name]}</p>
+            <p>{formatTime(nextPrayer.time)}</p>
+            <p>{timeLeft}</p>
           </div>
         )}
         <div
@@ -188,4 +188,17 @@ export default function Prayer({ prayerTimes, selectedCity, onCityChange }) {
       </div>
     </div>
   );
-}
+};
+
+Prayer.propTypes = {
+  prayerTimes: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      time: PropTypes.string.isRequired,
+    })
+  ),
+  selectedCity: PropTypes.string.isRequired,
+  onCityChange: PropTypes.func.isRequired,
+};
+
+export default Prayer;

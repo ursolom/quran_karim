@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import surahMap from "../data/Surah";
 import { CiSearch } from "react-icons/ci";
 import { TiArrowBack } from "react-icons/ti";
+import Meccan from "../../public/img_site/Meccan.png";
+import Medinan from "../../public/img_site/Medinan.png";
 
 const Fahras = ({ onSurahClick, onGoBack }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,8 +22,8 @@ const Fahras = ({ onSurahClick, onGoBack }) => {
   };
 
   return (
-    <div className="flex flex-col " dir="rtl">
-      <header className="w-full  bg-green-600 h-64 py-6 flex justify-center px-11 fixed z-10">
+    <div className="flex flex-col" dir="rtl">
+      <header className="w-full bg-green-600 h-64 py-6 flex justify-center px-11 fixed z-10">
         <div className="w-full">
           <div className="flex items-center">
             <input
@@ -37,7 +39,7 @@ const Fahras = ({ onSurahClick, onGoBack }) => {
         </div>
         <button
           onClick={onGoBack}
-          className="absolute top-0 left-0 text-white p-1 m-3 hover:ml-2  transition-all duration-200 "
+          className="absolute top-0 left-0 text-white p-1 m-3 hover:ml-2 transition-all duration-200"
         >
           <TiArrowBack className="size-12" />
         </button>
@@ -70,11 +72,7 @@ const Fahras = ({ onSurahClick, onGoBack }) => {
                 <div>{surah.ayat}</div>
                 <div>
                   <img
-                    src={
-                      surah.type === "Meccan"
-                        ? "../../public/img_site/Meccan.png"
-                        : "../../public/img_site/Medinan.png"
-                    }
+                    src={surah.type === "Meccan" ? Meccan : Medinan}
                     alt={surah.type}
                     className="md:w-16 md:h-16 w-8 h-8"
                   />

@@ -7,7 +7,8 @@ import MouseAnimation from "./components/MouseAnimation";
 import { AiFillSound } from "react-icons/ai";
 import { FaVolumeMute } from "react-icons/fa";
 import axios from "axios";
-
+import notification from "../public/audio/notification.mp3";
+import sunrise from "../public/audio/sunrise.mp3";
 const prayerNames = ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"];
 const adhanUrl =
   "https://ia600908.us.archive.org/12/items/90---azan---90---azan--many----sound----mp3---alazan/";
@@ -18,7 +19,7 @@ const adhanSounds = {
   العصر: `${adhanUrl}052-.mp3`,
   المغرب: `${adhanUrl}052-.mp3`,
   العشاء: `${adhanUrl}052-.mp3`,
-  الشروق: "../public/audio/sunrise.mp3",
+  الشروق: sunrise,
 };
 
 const App = () => {
@@ -31,9 +32,7 @@ const App = () => {
   const [audioContextInitialized, setAudioContextInitialized] = useState(false);
 
   const audioRef = useRef(new Audio());
-  const afterPrayerAudioRef = useRef(
-    new Audio("../public/audio/notification.mp3")
-  );
+  const afterPrayerAudioRef = useRef(new Audio(notification));
 
   const toggleMute = () => {
     setIsMuted(!isMuted);

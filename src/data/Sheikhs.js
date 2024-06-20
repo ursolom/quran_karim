@@ -1,111 +1,129 @@
+import Elminshwey from "../../public/img_site/Sheikhs/Elminshwey.jpg";
+import Hosary from "../../public/img_site/Sheikhs/Hosary.jpg";
+import Dosari from "../../public/img_site/Sheikhs/Dosari.jpg";
+import Abd_El_Basset from "../../public/img_site/Sheikhs/Abd_El_Basset.jpg";
+import Banna from "../../public/img_site/Sheikhs/Banna.jpg";
+import Ali_Jaber from "../../public/img_site/Sheikhs/Ali_Jaber.jpg";
+import Maher_Almaikulai from "../../public/img_site/Sheikhs/Maher_Almaikulai.jpg";
+import Nasser from "../../public/img_site/Sheikhs/Nasser.jpg";
+import Islam from "../../public/img_site/Sheikhs/Islam.jpg";
+import Abdullrahman_Alsudais from "../../public/img_site/Sheikhs/Abdullrahman_Alsudais.jpg";
+import Al_Ajmi from "../../public/img_site/Sheikhs/Al_Ajmi.jpg";
+import Al_Afasy from "../../public/img_site/Sheikhs/Al_Afasy.jpg";
+import Fares_Abbad from "../../public/img_site/Sheikhs/Fares_Abbad.jpg";
+import Mohamed_Ayoub from "../../public/img_site/Sheikhs/Mohamed_Ayoub.jpg";
+import Ali_Al_Hudhayfi from "../../public/img_site/Sheikhs/Ali_Al_Hudhayfi.jpg";
+import sodais_and_shuraim from "../../public/img_site/Sheikhs/sodais_and_shuraim.jpg";
+import Saad from "../../public/img_site/Sheikhs/Saad.jpg";
+import Salah from "../../public/img_site/Sheikhs/Salah.jpg";
+
 const sheikhs = [
   {
     id: 1,
     name: "محمد صديق المنشاوي",
-    img: "../../public/img_site/Sheikhs/Elminshwey.jpg",
+    img: Elminshwey,
     audioSource: "https://server10.mp3quran.net/minsh/",
   },
   {
     id: 2,
     name: "محمود خليل الحصري",
-    img: "../../public/img_site/Sheikhs/Hosary.jpg",
+    img: Hosary,
     audioSource: "https://server13.mp3quran.net/husr/",
   },
   {
     id: 3,
     name: "ياسر الدوسري",
-    img: "../../public/img_site/Sheikhs/Dosari.jpg",
+    img: Dosari,
     audioSource: "https://server11.mp3quran.net/yasser/",
   },
   {
     id: 4,
     name: "عبدالباسط عبدالصمد",
-    img: "../../public/img_site/Sheikhs/Abd_El_Basset.jpg",
+    img: Abd_El_Basset,
     audioSource: "https://server7.mp3quran.net/basit/",
   },
   {
     id: 5,
     name: "محمود علي البنا ",
-    img: "../../public/img_site/Sheikhs/Banna.jpg",
+    img: Banna,
     audioSource: "https://server8.mp3quran.net/bna/",
   },
   {
     id: 6,
     name: "علي جابر",
-    img: "../../public/img_site/Sheikhs/Ali_Jaber.jpg",
+    img: Ali_Jaber,
     audioSource: "https://server11.mp3quran.net/a_jbr/",
   },
   {
     id: 7,
     name: "ماهر المعيقلي",
-    img: "../../public/img_site/Sheikhs/Maher_Almaikulai.jpg",
+    img: Maher_Almaikulai,
     audioSource: "https://server12.mp3quran.net/maher/",
   },
   {
     id: 8,
     name: "ناصر القطامي",
-    img: "../../public/img_site/Sheikhs/Nasser.jpg",
+    img: Nasser,
     audioSource: "https://server6.mp3quran.net/qtm/",
   },
   {
     id: 9,
     name: "إسلام صبحي",
-    img: "../../public/img_site/Sheikhs/Islam.jpg",
+    img: Islam,
     audioSource: "https://server14.mp3quran.net/islam/Rewayat-Hafs-A-n-Assem/",
   },
   {
     id: 10,
     name: "عبدالرحمن السديس",
-    img: "../../public/img_site/Sheikhs/Abdullrahman_Alsudais.jpg",
+    img: Abdullrahman_Alsudais,
     audioSource: "https://server11.mp3quran.net/sds/",
   },
   {
     id: 11,
     name: "أحمد بن علي العجمي",
-    img: "../../public/img_site/Sheikhs/Al_Ajmi.jpg",
+    img: Al_Ajmi,
     audioSource: "https://server10.mp3quran.net/ajm/",
   },
   {
     id: 12,
     name: "مشاري العفاسي",
-    img: "../../public/img_site/Sheikhs/Al_Afasy.jpg",
+    img: Al_Afasy,
     audioSource: "https://server8.mp3quran.net/afs/",
   },
   {
     id: 13,
     name: "فارس عباد",
-    img: "../../public/img_site/Sheikhs/Fares_Abbad.jpg",
+    img: Fares_Abbad,
     audioSource: "https://server8.mp3quran.net/frs_a/",
   },
   {
     id: 14,
     name: "محمد أيوب",
-    img: "../../public/img_site/Sheikhs/Mohamed_Ayoub.jpg",
+    img: Mohamed_Ayoub,
     audioSource: "https://server16.mp3quran.net/ayyoub2/Rewayat-Hafs-A-n-Assem/",
   },
   {
     id: 15,
     name: "علي الحذيفي",
-    img: "../../public/img_site/Sheikhs/Ali_Al_Hudhayfi.jpg",
+    img: Ali_Al_Hudhayfi,
     audioSource: "https://server9.mp3quran.net/hthfi/",
   },
-
   {
     id: 16,
     name: "السديس والشريم",
-    img: "../../public/img_site/Sheikhs/sodais_and_shuraim.jpg",
+    img: sodais_and_shuraim,
     audioSource: "https://download.quranicaudio.com/quran/sodais_and_shuraim/",
   },
   {
     id: 17,
     name: "سعد الغامدي",
-    img: "../../public/img_site/Sheikhs/Saad.jpg",
+    img: Saad,
     audioSource: "https://server7.mp3quran.net/s_gmd/",
   },
   {
     id: 18,
     name: "صلاح بو خاطر ",
-    img: "../../public/img_site/Sheikhs/Salah.jpg",
+    img: Salah,
     audioSource: "https://server8.mp3quran.net/bu_khtr/",
   },
 ];
