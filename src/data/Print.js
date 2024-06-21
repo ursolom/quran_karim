@@ -22,12 +22,6 @@ const imageSources = [
   {
     name: "طباعة رقم 4",
     type: "remote",
-    baseUrl: "http://www.islamicbook.ws/1/",
-    extension: ".png",
-  },
-  {
-    name: "طباعة رقم 5",
-    type: "remote",
     baseUrl: "https://surahquran.com/img/pages-quran/page",
     extension: ".png",
   },
