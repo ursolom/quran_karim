@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Prayer from "./pages/Prayer";
@@ -42,30 +42,42 @@ const App = () => {
     afterPrayerAudioRef.current.muted = !isMuted;
   };
 
-  const shouldNotify = (lastNotification, now) => {
+  const shouldNotify = useCallback((lastNotification, now) => {
     if (!lastNotification) return true;
     const diff = now - lastNotification;
     return diff > 60 * 1000;
-  };
+  }, []);
 
-  const fetchPrayerTimes = async (city) => {
+  const fetchPrayerTimes = useCallback(async (city) => {
+    const cachedData = localStorage.getItem(`prayerTimes_${city}`);
+    const now = new Date().getTime();
+    if (cachedData) {
+      const { data, timestamp } = JSON.parse(cachedData);
+      if (now - timestamp < 24 * 60 * 60 * 1000) {
+        setPrayerTimes(data);
+        return;
+      }
+    }
     try {
       const response = await axios.get(
         `https://api.aladhan.com/v1/timingsByCity?country=egypt&city=${city}`
       );
       const timings = response.data?.data?.timings;
       if (timings) {
-        setPrayerTimes(
-          prayerNames.map((name) => ({
-            name,
-            time: timings[translatePrayerNameToEnglish(name)],
-          }))
+        const times = prayerNames.map((name) => ({
+          name,
+          time: timings[translatePrayerNameToEnglish(name)],
+        }));
+        setPrayerTimes(times);
+        localStorage.setItem(
+          `prayerTimes_${city}`,
+          JSON.stringify({ data: times, timestamp: now })
         );
       }
     } catch (error) {
       console.error("Error fetching prayer times:", error);
     }
-  };
+  }, []);
 
   const translatePrayerNameToEnglish = (name) => {
     const translation = {
@@ -90,12 +102,9 @@ const App = () => {
         const silentAudio = new Audio(
           "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA="
         );
-        silentAudio
-          .play()
-          .then(() => {})
-          .catch((error) => {
-            console.error("Failed to initialize audio context:", error);
-          });
+        silentAudio.play().catch((error) => {
+          console.error("Failed to initialize audio context:", error);
+        });
       }
     };
 
@@ -213,11 +222,19 @@ const App = () => {
       });
     };
 
-    const interval = setInterval(checkPrayerTime, 1000);
-    checkPrayerTime();
+    const updateInterval = () => {
+      const now = new Date();
+      const nextCheck = new Date(now.getTime() + 60000); // Next minute
+      const nextCheckDelay = nextCheck.getTime() - now.getTime();
+      setTimeout(() => {
+        checkPrayerTime();
+        updateInterval();
+      }, nextCheckDelay);
+    };
 
-    return () => clearInterval(interval);
-  }, [prayerTimes, selectedCity, isMuted]);
+    updateInterval();
+    checkPrayerTime();
+  }, [prayerTimes, selectedCity, isMuted, fetchPrayerTimes, shouldNotify]);
 
   const handleCityChange = (event) => {
     const city = event.target.value;
