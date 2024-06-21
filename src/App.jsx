@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Prayer from "./pages/Prayer";
 import Profiler from "./pages/Profiler";
-// import MouseAnimation from "./components/MouseAnimation";
+import MouseAnimation from "./components/MouseAnimation";
 import { AiFillSound } from "react-icons/ai";
 import { FaVolumeMute } from "react-icons/fa";
 import axios from "axios";
-import NotFond from "./pages/NotFond";
 import notification from "../public/audio/notification.mp3";
 import sunrise from "../public/audio/sunrise.mp3";
+import NotFond from "./pages/NotFond";
 
 const prayerNames = ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"];
 const adhanUrl =
@@ -33,8 +33,13 @@ const App = () => {
   const [lastNotificationTime, setLastNotificationTime] = useState(null);
   const [audioContextInitialized, setAudioContextInitialized] = useState(false);
 
+  const audioRef = useRef(new Audio());
+  const afterPrayerAudioRef = useRef(new Audio(notification));
+
   const toggleMute = () => {
     setIsMuted(!isMuted);
+    audioRef.current.muted = !isMuted;
+    afterPrayerAudioRef.current.muted = !isMuted;
   };
 
   const shouldNotify = (lastNotification, now) => {
@@ -50,15 +55,11 @@ const App = () => {
       );
       const timings = response.data?.data?.timings;
       if (timings) {
-        const times = prayerNames.map((name) => ({
-          name,
-          time: timings[translatePrayerNameToEnglish(name)],
-        }));
-        setPrayerTimes(times);
-        localStorage.setItem("prayerTimes", JSON.stringify(times));
-        localStorage.setItem(
-          "lastFetchedDate",
-          new Date().toISOString().split("T")[0]
+        setPrayerTimes(
+          prayerNames.map((name) => ({
+            name,
+            time: timings[translatePrayerNameToEnglish(name)],
+          }))
         );
       }
     } catch (error) {
@@ -112,19 +113,7 @@ const App = () => {
   }, [audioContextInitialized]);
 
   useEffect(() => {
-    const lastFetchedDate = localStorage.getItem("lastFetchedDate");
-    const today = new Date().toISOString().split("T")[0];
-
-    if (lastFetchedDate !== today) {
-      fetchPrayerTimes(selectedCity);
-    } else {
-      const storedPrayerTimes = JSON.parse(localStorage.getItem("prayerTimes"));
-      if (storedPrayerTimes) {
-        setPrayerTimes(storedPrayerTimes);
-      } else {
-        fetchPrayerTimes(selectedCity);
-      }
-    }
+    fetchPrayerTimes(selectedCity);
 
     const checkPrayerTime = () => {
       const now = new Date();
@@ -167,8 +156,8 @@ const App = () => {
           });
 
           if (!isMuted && adhanSounds[prayer.name]) {
-            const adhanAudio = new Audio(adhanSounds[prayer.name]);
-            adhanAudio.play().catch((error) => {
+            audioRef.current.src = adhanSounds[prayer.name];
+            audioRef.current.play().catch((error) => {
               console.error(`Failed to play Adhan audio: ${error}`);
             });
             document.getElementById("mute-button").style.display = "block";
@@ -198,8 +187,7 @@ const App = () => {
           });
 
           if (!isMuted) {
-            const afterPrayerAudio = new Audio(notification);
-            afterPrayerAudio.play().catch((error) => {
+            afterPrayerAudioRef.current.play().catch((error) => {
               console.error(`Failed to play after prayer audio: ${error}`);
             });
           }
@@ -217,8 +205,7 @@ const App = () => {
           });
 
           if (!isMuted) {
-            const afterPrayerAudio = new Audio(notification);
-            afterPrayerAudio.play().catch((error) => {
+            afterPrayerAudioRef.current.play().catch((error) => {
               console.error(`Failed to play after prayer audio: ${error}`);
             });
           }
@@ -242,7 +229,7 @@ const App = () => {
   return (
     <Router>
       <div>
-        {/* <MouseAnimation /> */}
+        <MouseAnimation />
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route
