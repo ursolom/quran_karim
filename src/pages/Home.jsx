@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { gsap } from "gsap";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -10,52 +10,51 @@ export default function Home() {
   const [isContentActive, setIsContentActive] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [isBookmarkSaved, setIsBookmarkSaved] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isFahrasVisible, setIsFahrasVisible] = useState(false);
   const headerRef = useRef(null);
   const footerRef = useRef(null);
   const fahrasRef = useRef(null);
   const searchComponentRef = useRef(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isFahrasVisible, setIsFahrasVisible] = useState(false);
+  const toggleContent = useCallback(() => {
+    setIsContentActive(prev => !prev);
+  }, []);
 
-  const toggleContent = () => {
-    setIsContentActive(!isContentActive);
-  };
-
-  const handlePageChange = (newPage) => {
+  const handlePageChange = useCallback((newPage) => {
     setCurrentPage(newPage);
-  };
+  }, []);
 
-  const handlePageSearch = (pageNumber) => {
+  const handlePageSearch = useCallback((pageNumber) => {
     setCurrentPage(pageNumber);
-  };
+  }, []);
 
-  const handleFahrasToggle = () => {
-    setIsFahrasVisible(!isFahrasVisible);
-  };
-
-  const handleSurahClick = (startPage) => {
+  const handleFahrasToggle = useCallback(() => {
+    setIsFahrasVisible(prev => !prev);
+  }, []);
+  
+  const handleSurahClick = useCallback((startPage) => {
     setCurrentPage(startPage);
     setIsFahrasVisible(false);
-  };
+  }, []);
 
-  const hideFahras = () => {
+  const hideFahras = useCallback(() => {
     setIsFahrasVisible(false);
-  };
+  }, []);
 
-  const toggleSearchVisibility = () => {
-    setIsSearchVisible(!isSearchVisible);
-  };
+  const toggleSearchVisibility = useCallback(() => {
+    setIsSearchVisible(prev => !prev);
+  }, []);
 
-  const hideSearch = () => {
+  const hideSearch = useCallback(() => {
     setIsSearchVisible(false);
-  };
+  }, []);
 
-  const handleSaveBookmark = () => {
+  const handleSaveBookmark = useCallback(() => {
     localStorage.setItem("bookmark", currentPage);
     setIsBookmarkSaved(true);
-    setTimeout(() => setIsBookmarkSaved(false), 2000); // Hide the bookmark indicator after 2 seconds
-  };
+    setTimeout(() => setIsBookmarkSaved(false), 2000);
+  }, [currentPage]);
 
   useEffect(() => {
     if (headerRef.current && footerRef.current) {
@@ -124,7 +123,6 @@ export default function Home() {
       >
         <Search onVerseClick={handlePageChange} onHide={hideSearch} />
       </div>
-
       <div className="w-[100%] h-[100vh] overflow-hidden absolute">
         <div
           ref={headerRef}
@@ -147,7 +145,6 @@ export default function Home() {
           )}
         </div>
       </div>
-
       <Content
         isContentActive={isContentActive}
         toggleContent={toggleContent}
@@ -156,7 +153,6 @@ export default function Home() {
         onPageSearch={handlePageSearch}
         onSaveBookmark={handleSaveBookmark}
       />
-
       <div className="w-[100%] h-[100vh] right-0 bottom-0 overflow-x-hidden absolute">
         <div
           ref={footerRef}
