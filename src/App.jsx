@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Prayer from "./pages/Prayer";
@@ -7,9 +7,9 @@ import MouseAnimation from "./components/MouseAnimation";
 import { AiFillSound } from "react-icons/ai";
 import { FaVolumeMute } from "react-icons/fa";
 import axios from "axios";
+import NotFond from "./pages/NotFond";
 import notification from "../public/audio/notification.mp3";
 import sunrise from "../public/audio/sunrise.mp3";
-import NotFond from "./pages/NotFond";
 
 const prayerNames = ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"];
 const adhanUrl =
@@ -33,13 +33,8 @@ const App = () => {
   const [lastNotificationTime, setLastNotificationTime] = useState(null);
   const [audioContextInitialized, setAudioContextInitialized] = useState(false);
 
-  const audioRef = useRef(new Audio());
-  const afterPrayerAudioRef = useRef(new Audio(notification));
-
   const toggleMute = () => {
     setIsMuted(!isMuted);
-    audioRef.current.muted = !isMuted;
-    afterPrayerAudioRef.current.muted = !isMuted;
   };
 
   const shouldNotify = (lastNotification, now) => {
@@ -130,9 +125,7 @@ const App = () => {
         fetchPrayerTimes(selectedCity);
       }
     }
-  }, [selectedCity]);
 
-  useEffect(() => {
     const checkPrayerTime = () => {
       const now = new Date();
 
@@ -174,8 +167,8 @@ const App = () => {
           });
 
           if (!isMuted && adhanSounds[prayer.name]) {
-            audioRef.current.src = adhanSounds[prayer.name];
-            audioRef.current.play().catch((error) => {
+            const adhanAudio = new Audio(adhanSounds[prayer.name]);
+            adhanAudio.play().catch((error) => {
               console.error(`Failed to play Adhan audio: ${error}`);
             });
             document.getElementById("mute-button").style.display = "block";
@@ -205,7 +198,8 @@ const App = () => {
           });
 
           if (!isMuted) {
-            afterPrayerAudioRef.current.play().catch((error) => {
+            const afterPrayerAudio = new Audio(notification);
+            afterPrayerAudio.play().catch((error) => {
               console.error(`Failed to play after prayer audio: ${error}`);
             });
           }
@@ -223,7 +217,8 @@ const App = () => {
           });
 
           if (!isMuted) {
-            afterPrayerAudioRef.current.play().catch((error) => {
+            const afterPrayerAudio = new Audio(notification);
+            afterPrayerAudio.play().catch((error) => {
               console.error(`Failed to play after prayer audio: ${error}`);
             });
           }
@@ -232,9 +227,10 @@ const App = () => {
     };
 
     const interval = setInterval(checkPrayerTime, 1000);
+    checkPrayerTime();
 
     return () => clearInterval(interval);
-  }, [prayerTimes, isMuted, lastNotificationTime]);
+  }, [prayerTimes, selectedCity, isMuted]);
 
   const handleCityChange = (event) => {
     const city = event.target.value;
