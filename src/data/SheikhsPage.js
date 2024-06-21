@@ -41,7 +41,7 @@ const SheikhsPage = [
   },
   {
     id: 6,
-    name: "محمود خليل الحصري",
+    name: "محمود علي البنا ",
     img: Banna,
     audioSource: "https://ia904507.us.archive.org/9/items/32-kb----mp3---albana--moratal---qasr-almonfasel------quran---safa7at-----604-/Page",
   },
