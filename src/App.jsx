@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Prayer from "./pages/Prayer";
 import Profiler from "./pages/Profiler";
-import MouseAnimation from "./components/MouseAnimation";
+// import MouseAnimation from "./components/MouseAnimation";
 import { AiFillSound } from "react-icons/ai";
 import { FaVolumeMute } from "react-icons/fa";
 import axios from "axios";
@@ -229,7 +229,7 @@ const App = () => {
   return (
     <Router>
       <div>
-        <MouseAnimation />
+        {/* <MouseAnimation /> */}
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route
