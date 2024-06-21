@@ -1,11 +1,6 @@
-import {
-  FaFacebook,
-  FaWhatsapp,
-  FaFacebookMessenger,
-} from "react-icons/fa";
+import { FaFacebook, FaWhatsapp, FaFacebookMessenger } from "react-icons/fa";
 import { TiArrowBack } from "react-icons/ti";
 import { Link } from "react-router-dom";
-
 
 export default function Profiler() {
   const about_site = [
@@ -13,7 +8,7 @@ export default function Profiler() {
     { article: "2 - كل رجل وامرأة وطفل فلسطيني فك الله كربهم" },
     {
       article:
-        "أهدي هذا الموقع اليك اخي المؤمن وأتمنئ من الله ان يتقبله خالصا لوجهه متئ ما قرات لا تنسانا والمسلمين من دعواتك كتب الله لكم البــشـر والفــرح",
+        "أهدي هذا الموقع إليك أخي المؤمن وأتمنى من الله أن يتقبله خالصًا لوجهه، متى ما قرأت لا تنسانا والمسلمين من دعواتك، كتب الله لكم البُشر والفرح.",
     },
   ];
 
@@ -38,18 +33,22 @@ export default function Profiler() {
 
   return (
     <>
-      <div className="border-[5px] w-full h-full">
-      <Link
-        to="/"
-        className="absolute top-5 left-5 z-40 p-2 rounded-xl text-white bg-neutral-900 bg-clip-padding backdrop-filter backdrop-blur bg-opacity-10 backdrop-saturate-100 backdrop-contrast-100"
-      >
-        <TiArrowBack />
-      </Link>
+      <div className="border-[5px] w-full h-full rounded-lg">
+        <Link
+          to="/"
+          className="absolute top-5 left-5 z-40 p-2 rounded-xl text-white bg-neutral-900 bg-clip-padding backdrop-filter backdrop-blur bg-opacity-10 backdrop-saturate-100 backdrop-contrast-100"
+        >
+          <TiArrowBack />
+        </Link>
         <div
           className="bg-green-400 col-span-1 p-4 flex flex-col gap-2 relative md:rounded-l-xl shadow-lg"
           dir="rtl"
         >
-          <p className="text-center">أهدي هذا الموقع الى كلا من :</p>
+          <p className="my-5">
+            ما رأيت أشرف ولا أعز ولا أغلى منك، كتاب الله، وهذا أقل ما أقدمه
+            ابتغاء وجه الله وابتغاء إعلاء كلماته، تبارك ربي.
+          </p>
+          <p className="text-center">أهدي هذا الموقع إلى كل من:</p>
           <div className="flex flex-col gap-5">
             {about_site.map((item, index) => (
               <p key={index}>{item.article}</p>
@@ -75,7 +74,7 @@ export default function Profiler() {
               ))}
             </div>
           </div>
-      <div className="text-center my-5">دمتم بخير وتقبل الله منا ومنكم</div>
+          <div className="text-center my-5">دمتم بخير وتقبل الله مـنــا ومــنــكــم</div>
         </div>
       </div>
     </>

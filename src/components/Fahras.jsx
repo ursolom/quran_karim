@@ -44,7 +44,7 @@ const Fahras = ({ onSurahClick, onGoBack }) => {
           <TiArrowBack className="size-12" />
         </button>
       </header>
-      <div className="relative top-44 flex flex-col md:text-[25px] text-[16px]">
+      <div className="relative top-44 flex flex-col md:text-[25px] text-[16px] ">
         <div className="w-full bg-white flex justify-between items-center py-7 px-5 rounded-t-3xl fixed z-10">
           <div className="flex gap-9">
             <div>#</div>
@@ -55,12 +55,12 @@ const Fahras = ({ onSurahClick, onGoBack }) => {
             <div>مكان النزول</div>
           </div>
         </div>
-        <div className="w-full top-24 bg-white relative">
+        <div className="w-full top-24 bg-white relative ">
           {filteredSurahMap.map((surah) => (
             <button
               key={surah.number}
               onClick={() => handleSurahClick(surah.parts[0].startPage)}
-              className="flex justify-between items-center py-7 px-5 hover:bg-gray-400 cursor-pointer transition-all duration-300 active:scale-90 border-b-[1px] border-black w-full"
+              className="flex justify-between items-center py-7 px-5 hover:bg-gray-400 cursor-pointer transition-all duration-300 active:scale-90 border-b-[1px] border-black w-full "
             >
               <div className="flex gap-3 items-center">
                 <div className="bg-green-300 rounded-full md:size-12 size-7 flex justify-center items-center">

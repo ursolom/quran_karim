@@ -9,7 +9,6 @@ import { Link } from "react-router-dom";
 import { TiArrowBack } from "react-icons/ti";
 import cityData from "../data/City";
 import Mosque from "../../public/img_site/Prayer/bg_mosque.jpg";
-
 const defaultCity = localStorage.getItem("selectedCity") || "cairo";
 
 const prayerIcons = {

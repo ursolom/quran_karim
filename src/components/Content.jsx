@@ -254,7 +254,7 @@ export default function Content({
         </div>
       )}
       <Swiper
-        className="w-full h-full flex justify-center items-center select-none transition-all duration-75"
+        className="size-full flex justify-center items-center select-none transition-all duration-75"
         style={{ backgroundColor }}
         spaceBetween={50}
         onSlideChange={handleSlideChange}
@@ -281,12 +281,12 @@ export default function Content({
             {loadedImages.includes(index) ? (
               <img
                 src={getImageUrl(index + 1)}
-                className="w-full h-full object-contain select-none"
+                className="size-full md:object-contain  select-none"
                 alt={`Slide ${index + 1}`}
                 onLoad={() => handleImageLoad(index)}
               />
             ) : (
-              <div className="w-full h-full flex justify-center items-center bg-white">
+              <div className="size-full flex justify-center items-center bg-white">
                 <div className="loader"></div>
               </div>
             )}
@@ -295,7 +295,7 @@ export default function Content({
       </Swiper>
       {isSidebarOpen && (
         <span
-          className="absolute w-full h-full bg-transparent z-40"
+          className="absolute size-full bg-transparent z-40"
           onClick={toggleSidebar}
         ></span>
       )}
@@ -331,8 +331,8 @@ export default function Content({
             isButtonMoved ? " translate-x-7" : ""
           }`}
         >
+          {savedPage === currentPage ? "تم حفظ العلامة" : "حفظ علامة"}
           <BsFillBookmarkPlusFill className="mr-2" />
-          {savedPage === currentPage ? "تم الحفظ" : "حفظ العلامة"}
         </button>
         <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
           {imageSources.map((source, index) => (

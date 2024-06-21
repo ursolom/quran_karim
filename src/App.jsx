@@ -9,6 +9,8 @@ import { FaVolumeMute } from "react-icons/fa";
 import axios from "axios";
 import notification from "../public/audio/notification.mp3";
 import sunrise from "../public/audio/sunrise.mp3";
+import NotFond from "./pages/NotFond";
+
 const prayerNames = ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"];
 const adhanUrl =
   "https://ia600908.us.archive.org/12/items/90---azan---90---azan--many----sound----mp3---alazan/";
@@ -88,7 +90,12 @@ const App = () => {
         const silentAudio = new Audio(
           "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA="
         );
-        silentAudio.play();
+        silentAudio
+          .play()
+          .then(() => {})
+          .catch((error) => {
+            console.error("Failed to initialize audio context:", error);
+          });
       }
     };
 
@@ -150,12 +157,14 @@ const App = () => {
 
           if (!isMuted && adhanSounds[prayer.name]) {
             audioRef.current.src = adhanSounds[prayer.name];
-            audioRef.current.play();
+            audioRef.current.play().catch((error) => {
+              console.error(`Failed to play Adhan audio: ${error}`);
+            });
             document.getElementById("mute-button").style.display = "block";
 
             setTimeout(() => {
               document.getElementById("mute-button").style.display = "none";
-            }, 2 * 60 * 1000);
+            }, 4 * 60 * 1000);
           }
         }
 
@@ -178,7 +187,9 @@ const App = () => {
           });
 
           if (!isMuted) {
-            afterPrayerAudioRef.current.play();
+            afterPrayerAudioRef.current.play().catch((error) => {
+              console.error(`Failed to play after prayer audio: ${error}`);
+            });
           }
         }
 
@@ -194,7 +205,9 @@ const App = () => {
           });
 
           if (!isMuted) {
-            afterPrayerAudioRef.current.play();
+            afterPrayerAudioRef.current.play().catch((error) => {
+              console.error(`Failed to play after prayer audio: ${error}`);
+            });
           }
         }
       });
@@ -215,7 +228,7 @@ const App = () => {
 
   return (
     <Router>
-      <div className="app-container">
+      <div>
         <MouseAnimation />
         <Routes>
           <Route exact path="/" element={<Home />} />
@@ -230,6 +243,7 @@ const App = () => {
             }
           />
           <Route path="/profile" element={<Profiler />} />
+          <Route path="*" element={<NotFond />} />
         </Routes>
         <button
           id="mute-button"
