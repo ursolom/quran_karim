@@ -213,6 +213,25 @@ const App = () => {
     return () => clearInterval(interval);
   }, [prayerTimes, isMuted, lastNotificationTime]);
 
+  useEffect(() => {
+    const handleAdhanPlaying = () => {
+      setShowMuteButton(true);
+    };
+
+    const handleAdhanEnded = () => {
+      setShowMuteButton(false);
+    };
+
+    const adhanAudio = audioRef.current;
+    adhanAudio.addEventListener("playing", handleAdhanPlaying);
+    adhanAudio.addEventListener("ended", handleAdhanEnded);
+
+    return () => {
+      adhanAudio.removeEventListener("playing", handleAdhanPlaying);
+      adhanAudio.removeEventListener("ended", handleAdhanEnded);
+    };
+  }, []);
+
   const handleCityChange = (event) => {
     const city = event.target.value;
     setSelectedCity(city);
