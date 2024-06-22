@@ -9,10 +9,11 @@ import axios from "axios";
 import notification from "../public/audio/notification.mp3";
 import sunrise from "../public/audio/sunrise.mp3";
 import NotFond from "./pages/NotFond";
-import { format, parse, isSameMinute, addMinutes, subMinutes } from "date-fns";
+import { parse, isSameMinute, addMinutes, subMinutes } from "date-fns";
 
 const prayerNames = ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"];
-const adhanUrl = "https://ia600908.us.archive.org/12/items/90---azan---90---azan--many----sound----mp3---alazan/";
+const adhanUrl =
+  "https://ia600908.us.archive.org/12/items/90---azan---90---azan--many----sound----mp3---alazan/";
 
 const adhanSounds = {
   الفجر: `${adhanUrl}035-.mp3`,
@@ -26,8 +27,10 @@ const adhanSounds = {
 const App = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [prayerTimes, setPrayerTimes] = useState([]);
-  const [selectedCity, setSelectedCity] = useState(localStorage.getItem("selectedCity") || "cairo");
-  const [lastNotificationTime, setLastNotificationTime] = useState(null);
+  const [selectedCity, setSelectedCity] = useState(
+    localStorage.getItem("selectedCity") || "cairo"
+  );
+  const [lastNotificationTime, setLastNotificationTime] = useState({});
   const [audioContextInitialized, setAudioContextInitialized] = useState(false);
 
   const audioRef = useRef(new Audio());
@@ -41,19 +44,23 @@ const App = () => {
 
   const shouldNotify = (lastNotification, now) => {
     if (!lastNotification) return true;
-    const diff = now - lastNotification;
+    const diff = now - new Date(lastNotification);
     return diff > 60 * 1000;
   };
 
   const fetchPrayerTimes = async (city) => {
     try {
-      const response = await axios.get(`https://api.aladhan.com/v1/timingsByCity?country=egypt&city=${city}`);
+      const response = await axios.get(
+        `https://api.aladhan.com/v1/timingsByCity?country=egypt&city=${city}`
+      );
       const timings = response.data?.data?.timings;
       if (timings) {
-        setPrayerTimes(prayerNames.map((name) => ({
-          name,
-          time: timings[translatePrayerNameToEnglish(name)],
-        })));
+        setPrayerTimes(
+          prayerNames.map((name) => ({
+            name,
+            time: timings[translatePrayerNameToEnglish(name)],
+          }))
+        );
       }
     } catch (error) {
       console.error("Error fetching prayer times:", error);
@@ -80,7 +87,9 @@ const App = () => {
     const initializeAudioContext = () => {
       if (!audioContextInitialized) {
         setAudioContextInitialized(true);
-        const silentAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA=");
+        const silentAudio = new Audio(
+          "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA="
+        );
         silentAudio.play().catch((error) => {
           console.error("Failed to initialize audio context:", error);
         });
@@ -111,27 +120,39 @@ const App = () => {
       prayerTimes.forEach((prayer) => {
         const prayerTime = parse(prayer.time, "HH:mm", new Date());
 
-        const triggerNotification = (message) => {
-          if (shouldNotify(lastNotificationTime, now)) {
+        const triggerNotification = (message, prayerName, type) => {
+          const key = `${prayerName}-${type}`;
+          if (shouldNotify(lastNotificationTime[key], now)) {
             new Notification(message.title, { body: message.body });
-            setLastNotificationTime(now);
+            setLastNotificationTime((prevTimes) => ({
+              ...prevTimes,
+              [key]: now,
+            }));
           }
         };
 
         const tenMinutesBefore = subMinutes(prayerTime, 10);
 
         if (isSameMinute(now, tenMinutesBefore)) {
-          triggerNotification({
-            title: "تنبيه",
-            body: `متبقي 10 دقائق على وقت صلاة ${prayer.name}`,
-          });
+          triggerNotification(
+            {
+              title: "تنبيه",
+              body: `متبقي 10 دقائق على وقت صلاة ${prayer.name}`,
+            },
+            prayer.name,
+            "before"
+          );
         }
 
         if (isSameMinute(now, prayerTime)) {
-          triggerNotification({
-            title: "وقت الصلاة",
-            body: `حان الآن وقت صلاة ${prayer.name}`,
-          });
+          triggerNotification(
+            {
+              title: "وقت الصلاة",
+              body: `حان الآن وقت صلاة ${prayer.name}`,
+            },
+            prayer.name,
+            "adhan"
+          );
 
           if (!isMuted && adhanSounds[prayer.name]) {
             audioRef.current.src = adhanSounds[prayer.name];
@@ -149,26 +170,42 @@ const App = () => {
         const fifteenMinutesAfter = addMinutes(prayerTime, 15);
         const fiveMinutesAfterMaghrib = addMinutes(prayerTime, 5);
 
-        if (["الفجر", "الظهر", "العصر", "العشاء"].includes(prayer.name) && isSameMinute(now, fifteenMinutesAfter)) {
-          triggerNotification({
-            title: "تنبيه",
-            body: `حان الآن وقت إقامة صلاة ${prayer.name}`,
-          });
+        if (
+          ["الفجر", "الظهر", "العصر", "العشاء"].includes(prayer.name) &&
+          isSameMinute(now, fifteenMinutesAfter)
+        ) {
+          triggerNotification(
+            {
+              title: "تنبيه",
+              body: `حان الآن وقت إقامة صلاة ${prayer.name}`,
+            },
+            prayer.name,
+            "iqama"
+          );
 
           if (!isMuted) {
+            afterPrayerAudioRef.current.src = notification;
             afterPrayerAudioRef.current.play().catch((error) => {
               console.error(`Failed to play after prayer audio: ${error}`);
             });
           }
         }
 
-        if (prayer.name === "المغرب" && isSameMinute(now, fiveMinutesAfterMaghrib)) {
-          triggerNotification({
-            title: "تنبيه",
-            body: `حان الآن وقت إقامة صلاة ${prayer.name}`,
-          });
+        if (
+          prayer.name === "المغرب" &&
+          isSameMinute(now, fiveMinutesAfterMaghrib)
+        ) {
+          triggerNotification(
+            {
+              title: "تنبيه",
+              body: `حان الآن وقت إقامة صلاة ${prayer.name}`,
+            },
+            prayer.name,
+            "iqama"
+          );
 
           if (!isMuted) {
+            afterPrayerAudioRef.current.src = notification;
             afterPrayerAudioRef.current.play().catch((error) => {
               console.error(`Failed to play after prayer audio: ${error}`);
             });
@@ -181,7 +218,7 @@ const App = () => {
     checkPrayerTime();
 
     return () => clearInterval(interval);
-  }, [prayerTimes, isMuted]);
+  }, [prayerTimes, isMuted, lastNotificationTime]);
 
   const handleCityChange = (event) => {
     const city = event.target.value;
@@ -195,7 +232,16 @@ const App = () => {
       <div>
         <Routes>
           <Route exact path="/" element={<Home />} />
-          <Route path="/prayer" element={<Prayer prayerTimes={prayerTimes} selectedCity={selectedCity} onCityChange={handleCityChange} />} />
+          <Route
+            path="/prayer"
+            element={
+              <Prayer
+                prayerTimes={prayerTimes}
+                selectedCity={selectedCity}
+                onCityChange={handleCityChange}
+              />
+            }
+          />
           <Route path="/profile" element={<Profiler />} />
           <Route path="*" element={<NotFond />} />
         </Routes>
@@ -205,7 +251,11 @@ const App = () => {
           style={{ display: "none" }}
           className="absolute top-3 right-3 bg-green-600 rounded-lg p-2 text-[30px] text-white hover:bg-green-500 z-[9999]"
         >
-          {isMuted ? <FaVolumeMute className="text-red-700" /> : <AiFillSound />}
+          {isMuted ? (
+            <FaVolumeMute className="text-red-700" />
+          ) : (
+            <AiFillSound />
+          )}
         </button>
       </div>
     </Router>
