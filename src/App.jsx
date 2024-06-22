@@ -131,7 +131,7 @@ const App = () => {
             }));
 
             if (type === "adhan") {
-              setShowMuteButton(true);
+              setShowMuteButton(true); // إظهار زر كتم الصوت عند بداية الأذان
             }
 
             if (!isMuted && audioSrc) {
