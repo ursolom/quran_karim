@@ -1,10 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { CiSearch } from "react-icons/ci";
 import { TiArrowBack } from "react-icons/ti";
 import QuranSearch from "../data/QuranSearch";
 import surahMap from "../data/Surah";
 import PageData from "../data/PageData";
 import PropTypes from "prop-types";
+import _ from 'lodash';
 
 const wordOccurrences = (text, word) => {
   const regex = new RegExp(word, "gi");
@@ -26,48 +27,66 @@ const findPage = (surah, ayah) => {
 
 const Search = ({ onVerseClick, onHide }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
   const [isInputValid, setIsInputValid] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
   const resultsContainerRef = useRef(null);
 
-  const handleSearch = (event) => {
+  const handleSearch = useCallback(
+    _.debounce((term) => {
+      if (term.trim().length < 3) {
+        setIsInputValid(false);
+        setSearchResults([]);
+        return;
+      } else {
+        setIsInputValid(true);
+      }
+
+      setIsLoading(true);
+
+      const searchResults = QuranSearch.filter((verse) =>
+        term
+          .trim()
+          .split(" ")
+          .filter(Boolean)
+          .every((word) => verse.content.includes(word))
+      );
+
+      setSearchResults(searchResults);
+      setIsLoading(false);
+    }, 300),
+    []
+  );
+
+  const handleInputChange = (event) => {
     const term = event.target.value;
     setSearchTerm(term);
-
-    if (term.trim().length < 3) {
-      setIsInputValid(false);
-      setSearchResults([]);
-      return;
-    } else {
-      setIsInputValid(true);
-    }
-
-    setIsLoading(true);
-    const searchWords = term.trim().split(" ").filter(Boolean);
-
-    setTimeout(() => {
-      const results = QuranSearch.filter((verse) =>
-        searchWords.every((word) => verse.content.includes(word))
-      );
-      setSearchResults(results);
-      setIsLoading(false);
-    }, 1000);
+    handleSearch(term);
   };
 
-  const handleVerseClick = (surahNumber, verseNumber) => {
-    const page = findPage(surahNumber, verseNumber);
-    if (page && onVerseClick) {
-      onVerseClick(page);
-      onHide();
-    }
-  };
+  const handleVerseClick = useCallback(
+    (surahNumber, verseNumber) => {
+      const page = findPage(surahNumber, verseNumber);
+      if (page && onVerseClick) {
+        onVerseClick(page);
+        onHide();
+      }
+    },
+    [onVerseClick, onHide]
+  );
 
-  const handleBackClick = () => {
+  const handleBackClick = useCallback(() => {
     if (onHide) {
       onHide();
     }
-  };
+  }, [onHide]);
+
+  const totalOccurrences = useMemo(() => {
+    return searchResults.reduce(
+      (total, verse) => total + wordOccurrences(verse.content, searchTerm),
+      0
+    );
+  }, [searchResults, searchTerm]);
 
   return (
     <div className="flex flex-col" dir="rtl">
@@ -76,13 +95,13 @@ const Search = ({ onVerseClick, onHide }) => {
           <div className="flex items-center">
             <input
               type="text"
-              className="w-full md:py-3 py-1 px-5 bg-transparent text-white outline-white placeholder-white text-[20px] transition-all"
-              placeholder="البحث في القران الكريم"
+              className="w-full md:py-3 py-1 px-5 bg-transparent text-white outline-none placeholder-white text-[20px] transition-all focus:outline-white rounded focus:rounded-xl"
+              placeholder="البحث في القرآن الكريم"
               dir="rtl"
               value={searchTerm}
-              onChange={handleSearch}
+              onChange={handleInputChange}
             />
-            <CiSearch className="text-white size-9 left-11 relative" />
+            <CiSearch className="text-white size-9 left-11 relative -z-10" />
           </div>
         </div>
         <button
@@ -99,43 +118,18 @@ const Search = ({ onVerseClick, onHide }) => {
               يرجى إدخال ثلاثة أحرف على الأقل للبحث
             </div>
           )}
-
-          {!isLoading && (
-            <div className="w-full  flex justify-between items-center">
+          {!isLoading && searchTerm && (
+            <div className="w-full flex justify-between items-center">
               <div>عدد ظهور الكلمة</div>
               <div>&quot;{searchTerm}&quot;</div>
-              <div>
-                {searchResults.reduce(
-                  (total, verse) =>
-                    total + wordOccurrences(verse.content, searchTerm),
-                  0
-                )}
-              </div>
+              <div>{totalOccurrences}</div>
             </div>
           )}
         </div>
         {isLoading && (
-          <>
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={index}
-                className="top-24 relative py-5 md:px-7 flex flex-col gap-5 px-3 border-b-2 hover:bg-blue-200 active:scale-90 transition duration-100"
-              >
-                <div className="md:text-[25px] text-[15px]">
-                  جاري التحميل........
-                </div>
-                <div className="flex justify-between items-center text-slate-600">
-                  <div>
-                    <div>جاري التحميل</div>
-                  </div>
-                  <div className="flex gap-7 items-center">
-                    <div>جاري التحميل </div>
-                    <div>جاري التحميل </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </>
+          <div className="flex flex-col gap-5 py-5 px-3 border-b-2">
+            <div className="bg-gray-600 h-4 w-full rounded-md animate-pulse" />
+          </div>
         )}
         <div ref={resultsContainerRef}>
           {searchResults.map((verse, index) => {
@@ -143,7 +137,7 @@ const Search = ({ onVerseClick, onHide }) => {
             return (
               <div
                 key={index}
-                className="top-24 relative py-5 md:px-7 flex flex-col gap-5 px-3 border-b-2 hover:bg-blue-200 active:scale-90 transition duration-100"
+                className="top-24 bg-white relative py-5 md:px-7 flex flex-col gap-5 px-3 border-b-2 hover:bg-blue-200 active:scale-90 transition duration-100"
                 onClick={() =>
                   handleVerseClick(verse.surah_number, verse.verse_number)
                 }
@@ -175,8 +169,10 @@ const Search = ({ onVerseClick, onHide }) => {
     </div>
   );
 };
+
 Search.propTypes = {
   onVerseClick: PropTypes.func.isRequired,
   onHide: PropTypes.func.isRequired,
 };
+
 export default Search;

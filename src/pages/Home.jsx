@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from "react";
 import { gsap } from "gsap";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Content from "../components/Content";
-import Fahras from "../components/Fahras";
-import Search from "../components/Search";
+import LoadingAnimation from "../components/LoadingAnimation"; // استيراد مكون التحميل المخصص
+
+const Fahras = lazy(() => import("../components/Fahras"));
+const Search = lazy(() => import("../components/Search"));
 
 export default function Home() {
   const [isContentActive, setIsContentActive] = useState(false);
@@ -12,13 +14,14 @@ export default function Home() {
   const [isBookmarkSaved, setIsBookmarkSaved] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isFahrasVisible, setIsFahrasVisible] = useState(false);
+
   const headerRef = useRef(null);
   const footerRef = useRef(null);
   const fahrasRef = useRef(null);
   const searchComponentRef = useRef(null);
 
   const toggleContent = useCallback(() => {
-    setIsContentActive(prev => !prev);
+    setIsContentActive((prev) => !prev);
   }, []);
 
   const handlePageChange = useCallback((newPage) => {
@@ -30,9 +33,9 @@ export default function Home() {
   }, []);
 
   const handleFahrasToggle = useCallback(() => {
-    setIsFahrasVisible(prev => !prev);
+    setIsFahrasVisible((prev) => !prev);
   }, []);
-  
+
   const handleSurahClick = useCallback((startPage) => {
     setCurrentPage(startPage);
     setIsFahrasVisible(false);
@@ -43,7 +46,7 @@ export default function Home() {
   }, []);
 
   const toggleSearchVisibility = useCallback(() => {
-    setIsSearchVisible(prev => !prev);
+    setIsSearchVisible((prev) => !prev);
   }, []);
 
   const hideSearch = useCallback(() => {
@@ -57,24 +60,18 @@ export default function Home() {
   }, [currentPage]);
 
   useEffect(() => {
+    const tl = gsap.timeline({ defaults: { duration: 0.5, ease: "power2.inOut" } });
     if (headerRef.current && footerRef.current) {
-      gsap.fromTo(
+      tl.fromTo(
         headerRef.current,
         { right: "0" },
-        {
-          right: isContentActive ? "-100%" : "0",
-          duration: 0.5,
-          ease: "power2.inOut",
-        }
-      );
-      gsap.fromTo(
+        { right: isContentActive ? "-100%" : "0" }
+      )
+      .fromTo(
         footerRef.current,
         { right: "0" },
-        {
-          right: isContentActive ? "-100%" : "0",
-          duration: 1.0,
-          ease: "power2.inOut",
-        }
+        { right: isContentActive ? "-100%" : "0" },
+        0 
       );
     }
   }, [isContentActive]);
@@ -109,20 +106,28 @@ export default function Home() {
 
   return (
     <>
-      <div className="w-full absolute h-full overflow-x-hidden">
+      {isFahrasVisible && (
+        <div className="w-full absolute h-full overflow-x-hidden">
+          <div
+            ref={fahrasRef}
+            className="w-full h-full absolute left-[-100%] top-0 bg-white z-50 transition-all duration-500"
+          >
+            <Suspense fallback={<LoadingAnimation />}>
+              <Fahras onSurahClick={handleSurahClick} onGoBack={hideFahras} />
+            </Suspense>
+          </div>
+        </div>
+      )}
+      {isSearchVisible && (
         <div
-          ref={fahrasRef}
+          ref={searchComponentRef}
           className="w-full h-full absolute left-[-100%] top-0 bg-white z-50 transition-all duration-500"
         >
-          <Fahras onSurahClick={handleSurahClick} onGoBack={hideFahras} />
+          <Suspense fallback={<LoadingAnimation />}>
+            <Search onVerseClick={handlePageChange} onHide={hideSearch} />
+          </Suspense>
         </div>
-      </div>
-      <div
-        ref={searchComponentRef}
-        className="w-full h-full absolute left-[-100%] top-0 bg-white z-50 transition-all duration-500"
-      >
-        <Search onVerseClick={handlePageChange} onHide={hideSearch} />
-      </div>
+      )}
       <div className="w-[100%] h-[100vh] overflow-hidden absolute">
         <div
           ref={headerRef}

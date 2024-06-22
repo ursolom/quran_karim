@@ -10,6 +10,7 @@ import { BsFillBookmarkPlusFill } from "react-icons/bs";
 import { FiMenu, FiX } from "react-icons/fi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import LoadingAnimation from "./LoadingAnimation";
 
 export default function Content({
   toggleContent,
@@ -236,11 +237,7 @@ export default function Content({
       dir="rtl"
     >
       <ToastContainer />
-      {isLoading && (
-        <div className="absolute inset-0 flex justify-center items-center bg-white z-10">
-          <div className="loader"></div>
-        </div>
-      )}
+      {isLoading && <LoadingAnimation />}
       {showSavedPageIndicator && (
         <div
           ref={bookmarkRef}

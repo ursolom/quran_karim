@@ -28,13 +28,13 @@ const Fahras = ({ onSurahClick, onGoBack }) => {
           <div className="flex items-center">
             <input
               type="text"
-              className="w-full md:py-3 py-1 px-5 bg-transparent text-white outline-white placeholder-white text-[20px] transition-all"
+                      className="w-full md:py-3 py-1 px-5 bg-transparent text-white outline-none placeholder-white text-[20px] transition-all focus:outline-white rounded focus:rounded-xl"
               placeholder="البحث في الفهرس"
               dir="rtl"
               value={searchTerm}
               onChange={handleSearch}
             />
-            <CiSearch className="text-white size-9 left-11 relative" />
+            <CiSearch className="text-white size-9 left-11 relative -z-10" />
           </div>
         </div>
         <button
@@ -60,7 +60,7 @@ const Fahras = ({ onSurahClick, onGoBack }) => {
             <button
               key={surah.number}
               onClick={() => handleSurahClick(surah.parts[0].startPage)}
-              className="flex justify-between items-center py-7 px-5 hover:bg-gray-400 cursor-pointer transition-all duration-300 active:scale-90 border-b-[1px] border-black w-full "
+              className="flex bg-white justify-between items-center py-7 px-5 hover:bg-gray-400 cursor-pointer transition-all duration-300 active:scale-90 border-b-[1px] border-black w-full "
             >
               <div className="flex gap-3 items-center">
                 <div className="bg-green-300 rounded-full md:size-12 size-7 flex justify-center items-center">

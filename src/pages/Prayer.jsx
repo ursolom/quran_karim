@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { TiArrowBack } from "react-icons/ti";
 import cityData from "../data/City";
 import Mosque from "../../public/img_site/Prayer/bg_mosque.jpg";
+const defaultCity = localStorage.getItem("selectedCity") || "cairo";
 
 const prayerIcons = {
   الفجر: <BsMoonStarsFill />,
@@ -49,6 +50,29 @@ const Prayer = ({ prayerTimes, selectedCity, onCityChange }) => {
     return `${hour12}:${minute.toString().padStart(2, "0")} ${period}`;
   };
 
+  const updateNextPrayer = () => {
+    if (!prayerTimes || prayerTimes.length === 0) {
+      return;
+    }
+
+    const now = new Date();
+    const nowHour = now.getHours();
+    const nowMinute = now.getMinutes();
+
+    for (const prayer of prayerTimes) {
+      const [hour, minute] = prayer.time.split(":").map(Number);
+      if (hour > nowHour || (hour === nowHour && minute > nowMinute)) {
+        setNextPrayer(prayer);
+        setTimeLeft(calculateTimeLeft(now, hour, minute));
+        return;
+      }
+    }
+
+    const [hour, minute] = prayerTimes[0].time.split(":").map(Number);
+    setNextPrayer(prayerTimes[0]);
+    setTimeLeft(calculateTimeLeft(now, hour, minute, true));
+  };
+
   const calculateTimeLeft = (now, hour, minute, isNextDay = false) => {
     const nextPrayerTime = new Date();
     if (isNextDay) {
@@ -73,40 +97,16 @@ const Prayer = ({ prayerTimes, selectedCity, onCityChange }) => {
     }
   };
 
-  const updateNextPrayer = () => {
-    if (!prayerTimes || prayerTimes.length === 0) {
-      return;
-    }
-
-    const now = new Date();
-    const nowHour = now.getHours();
-    const nowMinute = now.getMinutes();
-
-    for (const prayer of prayerTimes) {
-      const [hour, minute] = prayer.time.split(":").map(Number);
-      if (hour > nowHour || (hour === nowHour && minute > nowMinute)) {
-        setNextPrayer(prayer);
-        setTimeLeft(calculateTimeLeft(now, hour, minute));
-        return;
-      }
-    }
-
-    const [hour, minute] = prayerTimes[0].time.split(":").map(Number);
-    setNextPrayer(prayerTimes[0]);
-    setTimeLeft(calculateTimeLeft(now, hour, minute, true));
-  };
-
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
+      updateNextPrayer();
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
     updateNextPrayer();
-  }, [prayerTimes, currentTime]);
+
+    return () => clearInterval(interval);
+  }, [prayerTimes]);
 
   return (
     <div className="prayer-container md:text-[25px] text-[15px] overflow-hidden">
@@ -195,7 +195,7 @@ Prayer.propTypes = {
       name: PropTypes.string.isRequired,
       time: PropTypes.string.isRequired,
     })
-  ).isRequired,
+  ),
   selectedCity: PropTypes.string.isRequired,
   onCityChange: PropTypes.func.isRequired,
 };

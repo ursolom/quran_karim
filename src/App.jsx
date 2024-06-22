@@ -3,17 +3,16 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Prayer from "./pages/Prayer";
 import Profiler from "./pages/Profiler";
-// import MouseAnimation from "./components/MouseAnimation";
 import { AiFillSound } from "react-icons/ai";
 import { FaVolumeMute } from "react-icons/fa";
 import axios from "axios";
 import notification from "../public/audio/notification.mp3";
 import sunrise from "../public/audio/sunrise.mp3";
 import NotFond from "./pages/NotFond";
+import { format, parse, isSameMinute, addMinutes, subMinutes } from "date-fns";
 
 const prayerNames = ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"];
-const adhanUrl =
-  "https://ia600908.us.archive.org/12/items/90---azan---90---azan--many----sound----mp3---alazan/";
+const adhanUrl = "https://ia600908.us.archive.org/12/items/90---azan---90---azan--many----sound----mp3---alazan/";
 
 const adhanSounds = {
   الفجر: `${adhanUrl}035-.mp3`,
@@ -27,9 +26,7 @@ const adhanSounds = {
 const App = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [prayerTimes, setPrayerTimes] = useState([]);
-  const [selectedCity, setSelectedCity] = useState(
-    localStorage.getItem("selectedCity") || "cairo"
-  );
+  const [selectedCity, setSelectedCity] = useState(localStorage.getItem("selectedCity") || "cairo");
   const [lastNotificationTime, setLastNotificationTime] = useState(null);
   const [audioContextInitialized, setAudioContextInitialized] = useState(false);
 
@@ -50,17 +47,13 @@ const App = () => {
 
   const fetchPrayerTimes = async (city) => {
     try {
-      const response = await axios.get(
-        `https://api.aladhan.com/v1/timingsByCity?country=egypt&city=${city}`
-      );
+      const response = await axios.get(`https://api.aladhan.com/v1/timingsByCity?country=egypt&city=${city}`);
       const timings = response.data?.data?.timings;
       if (timings) {
-        setPrayerTimes(
-          prayerNames.map((name) => ({
-            name,
-            time: timings[translatePrayerNameToEnglish(name)],
-          }))
-        );
+        setPrayerTimes(prayerNames.map((name) => ({
+          name,
+          time: timings[translatePrayerNameToEnglish(name)],
+        })));
       }
     } catch (error) {
       console.error("Error fetching prayer times:", error);
@@ -87,15 +80,10 @@ const App = () => {
     const initializeAudioContext = () => {
       if (!audioContextInitialized) {
         setAudioContextInitialized(true);
-        const silentAudio = new Audio(
-          "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA="
-        );
-        silentAudio
-          .play()
-          .then(() => {})
-          .catch((error) => {
-            console.error("Failed to initialize audio context:", error);
-          });
+        const silentAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA=");
+        silentAudio.play().catch((error) => {
+          console.error("Failed to initialize audio context:", error);
+        });
       }
     };
 
@@ -114,14 +102,14 @@ const App = () => {
 
   useEffect(() => {
     fetchPrayerTimes(selectedCity);
+  }, [selectedCity]);
 
+  useEffect(() => {
     const checkPrayerTime = () => {
       const now = new Date();
 
       prayerTimes.forEach((prayer) => {
-        const [hour, minute] = prayer.time.split(":").map(Number);
-        const prayerTime = new Date();
-        prayerTime.setHours(hour, minute, 0, 0);
+        const prayerTime = parse(prayer.time, "HH:mm", new Date());
 
         const triggerNotification = (message) => {
           if (shouldNotify(lastNotificationTime, now)) {
@@ -130,26 +118,16 @@ const App = () => {
           }
         };
 
-        const tenMinutesBefore = new Date(
-          prayerTime.getTime() - 10 * 60 * 1000
-        );
+        const tenMinutesBefore = subMinutes(prayerTime, 10);
 
-        if (
-          now.getHours() === tenMinutesBefore.getHours() &&
-          now.getMinutes() === tenMinutesBefore.getMinutes() &&
-          now.getSeconds() === 0
-        ) {
+        if (isSameMinute(now, tenMinutesBefore)) {
           triggerNotification({
             title: "تنبيه",
             body: `متبقي 10 دقائق على وقت صلاة ${prayer.name}`,
           });
         }
 
-        if (
-          now.getHours() === hour &&
-          now.getMinutes() === minute &&
-          now.getSeconds() === 0
-        ) {
+        if (isSameMinute(now, prayerTime)) {
           triggerNotification({
             title: "وقت الصلاة",
             body: `حان الآن وقت صلاة ${prayer.name}`,
@@ -168,19 +146,10 @@ const App = () => {
           }
         }
 
-        const fifteenMinutesAfter = new Date(
-          prayerTime.getTime() + 15 * 60 * 1000
-        );
-        const fiveMinutesAfterMaghrib = new Date(
-          prayerTime.getTime() + 5 * 60 * 1000
-        );
+        const fifteenMinutesAfter = addMinutes(prayerTime, 15);
+        const fiveMinutesAfterMaghrib = addMinutes(prayerTime, 5);
 
-        if (
-          ["الفجر", "الظهر", "العصر", "العشاء"].includes(prayer.name) &&
-          now.getHours() === fifteenMinutesAfter.getHours() &&
-          now.getMinutes() === fifteenMinutesAfter.getMinutes() &&
-          now.getSeconds() === 0
-        ) {
+        if (["الفجر", "الظهر", "العصر", "العشاء"].includes(prayer.name) && isSameMinute(now, fifteenMinutesAfter)) {
           triggerNotification({
             title: "تنبيه",
             body: `حان الآن وقت إقامة صلاة ${prayer.name}`,
@@ -193,12 +162,7 @@ const App = () => {
           }
         }
 
-        if (
-          prayer.name === "المغرب" &&
-          now.getHours() === fiveMinutesAfterMaghrib.getHours() &&
-          now.getMinutes() === fiveMinutesAfterMaghrib.getMinutes() &&
-          now.getSeconds() === 0
-        ) {
+        if (prayer.name === "المغرب" && isSameMinute(now, fiveMinutesAfterMaghrib)) {
           triggerNotification({
             title: "تنبيه",
             body: `حان الآن وقت إقامة صلاة ${prayer.name}`,
@@ -217,7 +181,7 @@ const App = () => {
     checkPrayerTime();
 
     return () => clearInterval(interval);
-  }, [prayerTimes, selectedCity, isMuted]);
+  }, [prayerTimes, isMuted]);
 
   const handleCityChange = (event) => {
     const city = event.target.value;
@@ -229,19 +193,9 @@ const App = () => {
   return (
     <Router>
       <div>
-        {/* <MouseAnimation /> */}
         <Routes>
           <Route exact path="/" element={<Home />} />
-          <Route
-            path="/prayer"
-            element={
-              <Prayer
-                prayerTimes={prayerTimes}
-                selectedCity={selectedCity}
-                onCityChange={handleCityChange}
-              />
-            }
-          />
+          <Route path="/prayer" element={<Prayer prayerTimes={prayerTimes} selectedCity={selectedCity} onCityChange={handleCityChange} />} />
           <Route path="/profile" element={<Profiler />} />
           <Route path="*" element={<NotFond />} />
         </Routes>
@@ -251,11 +205,7 @@ const App = () => {
           style={{ display: "none" }}
           className="absolute top-3 right-3 bg-green-600 rounded-lg p-2 text-[30px] text-white hover:bg-green-500 z-[9999]"
         >
-          {isMuted ? (
-            <FaVolumeMute className="text-red-700" />
-          ) : (
-            <AiFillSound />
-          )}
+          {isMuted ? <FaVolumeMute className="text-red-700" /> : <AiFillSound />}
         </button>
       </div>
     </Router>
