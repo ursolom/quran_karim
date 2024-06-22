@@ -32,6 +32,7 @@ const App = () => {
   );
   const [lastNotificationTime, setLastNotificationTime] = useState({});
   const [audioContextInitialized, setAudioContextInitialized] = useState(false);
+  const [showMuteButton, setShowMuteButton] = useState(false);
 
   const audioRef = useRef(new Audio());
   const afterPrayerAudioRef = useRef(new Audio(notification));
@@ -120,7 +121,7 @@ const App = () => {
       prayerTimes.forEach((prayer) => {
         const prayerTime = parse(prayer.time, "HH:mm", new Date());
 
-        const triggerNotification = (message, prayerName, type) => {
+        const triggerNotification = (message, prayerName, type, audioSrc) => {
           const key = `${prayerName}-${type}`;
           if (shouldNotify(lastNotificationTime[key], now)) {
             new Notification(message.title, { body: message.body });
@@ -128,6 +129,17 @@ const App = () => {
               ...prevTimes,
               [key]: now,
             }));
+
+            if (type === "adhan") {
+              setShowMuteButton(true);
+            }
+
+            if (!isMuted && audioSrc) {
+              const audio = new Audio(audioSrc);
+              audio.play().catch((error) => {
+                console.error(`Failed to play notification audio: ${error}`);
+              });
+            }
           }
         };
 
@@ -151,7 +163,8 @@ const App = () => {
               body: `حان الآن وقت صلاة ${prayer.name}`,
             },
             prayer.name,
-            "adhan"
+            "adhan",
+            adhanSounds[prayer.name]
           );
 
           if (!isMuted && adhanSounds[prayer.name]) {
@@ -159,49 +172,29 @@ const App = () => {
             audioRef.current.play().catch((error) => {
               console.error(`Failed to play Adhan audio: ${error}`);
             });
-            document.getElementById("mute-button").style.display = "block";
 
-            setTimeout(() => {
-              document.getElementById("mute-button").style.display = "none";
-            }, 4 * 60 * 1000);
+            // لا يتم إيقاف الصوت هنا للسماح له باللعب بالكامل
           }
         }
 
-        const fifteenMinutesAfter = addMinutes(prayerTime, 15);
-        const fiveMinutesAfterMaghrib = addMinutes(prayerTime, 5);
+        let minutesAfterPrayer;
+        if (prayer.name === "المغرب") {
+          minutesAfterPrayer = 5;
+        } else {
+          minutesAfterPrayer = 15;
+        }
 
-        if (
-          ["الفجر", "الظهر", "العصر", "العشاء"].includes(prayer.name) &&
-          isSameMinute(now, fifteenMinutesAfter)
-        ) {
+        const afterPrayerTime = addMinutes(prayerTime, minutesAfterPrayer);
+
+        if (isSameMinute(now, afterPrayerTime)) {
           triggerNotification(
             {
               title: "تنبيه",
               body: `حان الآن وقت إقامة صلاة ${prayer.name}`,
             },
             prayer.name,
-            "iqama"
-          );
-
-          if (!isMuted) {
-            afterPrayerAudioRef.current.src = notification;
-            afterPrayerAudioRef.current.play().catch((error) => {
-              console.error(`Failed to play after prayer audio: ${error}`);
-            });
-          }
-        }
-
-        if (
-          prayer.name === "المغرب" &&
-          isSameMinute(now, fiveMinutesAfterMaghrib)
-        ) {
-          triggerNotification(
-            {
-              title: "تنبيه",
-              body: `حان الآن وقت إقامة صلاة ${prayer.name}`,
-            },
-            prayer.name,
-            "iqama"
+            "iqama",
+            notification
           );
 
           if (!isMuted) {
@@ -245,18 +238,19 @@ const App = () => {
           <Route path="/profile" element={<Profiler />} />
           <Route path="*" element={<NotFond />} />
         </Routes>
-        <button
-          id="mute-button"
-          onClick={toggleMute}
-          style={{ display: "none" }}
-          className="absolute top-3 right-3 bg-green-600 rounded-lg p-2 text-[30px] text-white hover:bg-green-500 z-[9999]"
-        >
-          {isMuted ? (
-            <FaVolumeMute className="text-red-700" />
-          ) : (
-            <AiFillSound />
-          )}
-        </button>
+        {showMuteButton && (
+          <button
+            id="mute-button"
+            onClick={toggleMute}
+            className="absolute top-3 right-3 bg-green-600 rounded-lg p-2 text-[30px] text-white hover:bg-green-500 z-[9999]"
+          >
+            {isMuted ? (
+              <FaVolumeMute className="text-red-700" />
+            ) : (
+              <AiFillSound />
+            )}
+          </button>
+        )}
       </div>
     </Router>
   );
