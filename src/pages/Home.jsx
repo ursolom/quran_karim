@@ -4,7 +4,7 @@ import { gsap } from "gsap";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Content from "../components/Content";
-import LoadingAnimation from "../components/LoadingAnimation"; // استيراد مكون التحميل المخصص
+import LoadingAnimation from "../components/LoadingAnimation";
 
 const Fahras = lazy(() => import("../components/Fahras"));
 const Search = lazy(() => import("../components/Search"));
