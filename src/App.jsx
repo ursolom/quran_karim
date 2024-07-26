@@ -172,8 +172,6 @@ const App = () => {
             audioRef.current.play().catch((error) => {
               console.error(`Failed to play Adhan audio: ${error}`);
             });
-
-            // لا يتم إيقاف الصوت هنا للسماح له باللعب بالكامل
           }
         }
 
