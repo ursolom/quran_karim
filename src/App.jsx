@@ -134,7 +134,6 @@ const App = () => {
               setShowMuteButton(true);
             }
 
-            // التأكد من أن الصوت لا يتم تشغيله بالفعل
             if (!isMuted && audioSrc && audioRef.current.paused) {
               audioRef.current.src = audioSrc;
               audioRef.current.play().catch((error) => {
