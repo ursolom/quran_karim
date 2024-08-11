@@ -134,9 +134,10 @@ const App = () => {
               setShowMuteButton(true);
             }
 
-            if (!isMuted && audioSrc) {
-              const audio = new Audio(audioSrc);
-              audio.play().catch((error) => {
+            // التأكد من أن الصوت لا يتم تشغيله بالفعل
+            if (!isMuted && audioSrc && audioRef.current.paused) {
+              audioRef.current.src = audioSrc;
+              audioRef.current.play().catch((error) => {
                 console.error(`Failed to play notification audio: ${error}`);
               });
             }
@@ -166,13 +167,6 @@ const App = () => {
             "adhan",
             adhanSounds[prayer.name]
           );
-
-          if (!isMuted && adhanSounds[prayer.name]) {
-            audioRef.current.src = adhanSounds[prayer.name];
-            audioRef.current.play().catch((error) => {
-              console.error(`Failed to play Adhan audio: ${error}`);
-            });
-          }
         }
 
         let minutesAfterPrayer;
@@ -195,7 +189,7 @@ const App = () => {
             notification
           );
 
-          if (!isMuted) {
+          if (!isMuted && afterPrayerAudioRef.current.paused) {
             afterPrayerAudioRef.current.src = notification;
             afterPrayerAudioRef.current.play().catch((error) => {
               console.error(`Failed to play after prayer audio: ${error}`);
