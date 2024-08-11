@@ -12,8 +12,7 @@ import NotFond from "./pages/NotFond";
 import { parse, isSameMinute, addMinutes, subMinutes } from "date-fns";
 
 const prayerNames = ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"];
-const adhanUrl =
-  "https://ia600908.us.archive.org/12/items/90---azan---90---azan--many----sound----mp3---alazan/";
+const adhanUrl = "https://ia600908.us.archive.org/12/items/90---azan---90---azan--many----sound----mp3---alazan/";
 
 const adhanSounds = {
   الفجر: `${adhanUrl}035-.mp3`,
@@ -27,9 +26,7 @@ const adhanSounds = {
 const App = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [prayerTimes, setPrayerTimes] = useState([]);
-  const [selectedCity, setSelectedCity] = useState(
-    localStorage.getItem("selectedCity") || "cairo"
-  );
+  const [selectedCity, setSelectedCity] = useState(localStorage.getItem("selectedCity") || "cairo");
   const [lastNotificationTime, setLastNotificationTime] = useState({});
   const [audioContextInitialized, setAudioContextInitialized] = useState(false);
   const [showMuteButton, setShowMuteButton] = useState(false);
@@ -51,9 +48,7 @@ const App = () => {
 
   const fetchPrayerTimes = async (city) => {
     try {
-      const response = await axios.get(
-        `https://api.aladhan.com/v1/timingsByCity?country=egypt&city=${city}`
-      );
+      const response = await axios.get(`https://api.aladhan.com/v1/timingsByCity?country=egypt&city=${city}`);
       const timings = response.data?.data?.timings;
       if (timings) {
         setPrayerTimes(
@@ -88,9 +83,7 @@ const App = () => {
     const initializeAudioContext = () => {
       if (!audioContextInitialized) {
         setAudioContextInitialized(true);
-        const silentAudio = new Audio(
-          "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA="
-        );
+        const silentAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA=");
         silentAudio.play().catch((error) => {
           console.error("Failed to initialize audio context:", error);
         });
