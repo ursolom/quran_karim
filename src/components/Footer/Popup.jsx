@@ -26,9 +26,20 @@ Title.propTypes = {
   title: PropTypes.string.isRequired,
 };
 
-const SheikhButton = ({ sheikh, isSelected, onClick, bgColorClass }) => (
+const SheikhButton = ({
+  sheikh,
+  isSelected,
+  onClick,
+  bgColorClass,
+  setMenuOpen,
+}) => (
   <button
-    onClick={() => onClick(sheikh)}
+    onClick={() => {
+      onClick(sheikh);
+      if (typeof setMenuOpen === 'function') {
+        setMenuOpen(false);
+      }
+    }}
     className={`${
       isSelected
         ? "bg-white text-green-600"
@@ -54,6 +65,7 @@ SheikhButton.propTypes = {
   isSelected: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
   bgColorClass: PropTypes.string.isRequired,
+  setMenuOpen: PropTypes.func,
 };
 
 const Popup = ({
@@ -106,6 +118,7 @@ const Popup = ({
         isSelected={selectedSheikhId === sheikh.id}
         onClick={onClickFunction}
         bgColorClass={bgColorClass}
+        setMenuOpen={setMenuOpen}
       />
     ));
   };
