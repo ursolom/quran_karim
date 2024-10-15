@@ -4,7 +4,6 @@ import { getSurahByPage } from "../data/Surah";
 import surahMap from "../data/Surah";
 import sheikhs from "../data/Sheikhs";
 import sheikhsPage from "../data/SheikhsPage";
-import { AnimatePresence } from "framer-motion";
 import "../App.css";
 import { Controller, Popup, TopFooter, BottomFooter } from "./Footer/index.js";
 
@@ -36,7 +35,6 @@ export default function Footer({ isContentActive, currentPage, onPageChange }) {
   });
   const [showVolumeControl, setShowVolumeControl] = useState(false);
   const audioRef = useRef(null);
-  const menuRef = useRef(null);
 
   useEffect(() => {
     localStorage.setItem("selectedSheikh", JSON.stringify(selectedSheikh));
@@ -264,27 +262,21 @@ export default function Footer({ isContentActive, currentPage, onPageChange }) {
         />
       </footer>
 
-      <div
-        className={`transition-opacity duration-300 ease-in-out ${
-          menuOpen ? "opacity-100 top-0 visible" : "opacity-0 invisible"
-        }`}
-      >
-        <Popup
-          ref={menuRef}
-          setMenuOpen={setMenuOpen}
-          playMode={playMode}
-          setPlayMode={setPlayMode}
-          selectedSheikh={selectedSheikh}
-          selectedSheikhPage={selectedSheikhPage}
-          availableSurahs={availableSurahs}
-          setSelectedSurah={setSelectedSurah}
-          sheikhs={sheikhs}
-          sheikhsPage={sheikhsPage}
-          selectSheikh={selectSheikh}
-          selectSheikhPage={selectSheikhPage}
-          selectedSurah={selectedSurah}
-        />
-      </div>
+      <Popup
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+        playMode={playMode}
+        setPlayMode={setPlayMode}
+        selectedSheikh={selectedSheikh}
+        selectedSheikhPage={selectedSheikhPage}
+        availableSurahs={availableSurahs}
+        setSelectedSurah={setSelectedSurah}
+        sheikhs={sheikhs}
+        sheikhsPage={sheikhsPage}
+        selectSheikh={selectSheikh}
+        selectSheikhPage={selectSheikhPage}
+        selectedSurah={selectedSurah}
+      />
     </>
   );
 }
