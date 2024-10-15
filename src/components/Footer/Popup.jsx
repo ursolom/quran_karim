@@ -1,4 +1,12 @@
 import PropTypes from "prop-types";
+import { IoMdCloseCircleOutline } from "react-icons/io";
+import useMeasure from "react-use-measure";
+import {
+  useDragControls,
+  useMotionValue,
+  useAnimate,
+  motion,
+} from "framer-motion";
 
 const Title = ({ title }) => (
   <div className="flex flex-col items-center justify-center w-full gap-1 mb-4 text-white">
@@ -63,6 +71,26 @@ const Popup = ({
   selectSheikhPage,
   selectedSurah,
 }) => {
+  const [scope, animate] = useAnimate();
+  const [drawerRef, { height }] = useMeasure();
+
+  const y = useMotionValue(0);
+  const controls = useDragControls();
+
+  const handleClose = async () => {
+    animate(scope.current, {
+      opacity: [1, 0],
+    });
+
+    const yStart = typeof y.get() === "number" ? y.get() : 0;
+
+    await animate("#drawer", {
+      y: [yStart, height],
+    });
+
+    setMenuOpen(false);
+  };
+
   const renderSheikhButtons = () => {
     const sheikhList = playMode === "surah" ? sheikhs : sheikhsPage;
     const selectedSheikhId =
@@ -84,63 +112,102 @@ const Popup = ({
 
   return (
     <>
-      <div
-        className={`absolute bottom-[100px] left-1/2 transform md:gap-5 -translate-x-1/2 bg-green-600 rounded-xl flex flex-col justify-between p-4 transition-all
-        duration-200 w-full max-h-[100vh] overflow-y-scroll z-50 shadow-lg ${
-          menuOpen ? "opacity-100 top-0 visible" : "opacity-0 top-9 invisible"
-        }`}
-      >
-      
-        <div className="mt-4">
-          <Title title="اختــر وضـع التشغيــل" />
-          <div className="flex flex-wrap justify-center gap-2 mt-2">
-            {["surah", "page"].map((mode) => (
+      {menuOpen && (
+        <motion.div
+          ref={scope}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          onClick={handleClose}
+          className="fixed inset-0 z-50 bg-neutral-950/70"
+        >
+          <motion.div
+            id="drawer"
+            ref={drawerRef}
+            onClick={(e) => e.stopPropagation()}
+            initial={{ y: "100%" }}
+            animate={{ y: "0%" }}
+            transition={{
+              ease: "easeInOut",
+            }}
+            className="absolute bottom-0 h-[75vh] w-full overflow-hidden rounded-t-3xl bg-green-600"
+            style={{ y }}
+            drag="y"
+            dragControls={controls}
+            onDragEnd={() => {
+              if (y.get() >= 100) {
+                handleClose();
+              }
+            }}
+            dragListener={false}
+            dragConstraints={{
+              top: 0,
+              bottom: 0,
+            }}
+            dragElastic={{
+              top: 0,
+              bottom: 0.5,
+            }}
+          >
+            <div className="absolute left-0 right-0 top-0 z-10 flex justify-center bg-green-600 p-4">
               <button
-                key={mode}
-                onClick={() => setPlayMode(mode)}
-                className={`${
-                  playMode === mode
-                    ? "bg-white text-green-600"
-                    : "bg-green-600 text-white hover:bg-green-500"
-                } p-2 rounded-lg transition-all duration-200`}
-              >
-                {mode === "surah" ? "ســورة" : "صــفــحــة"}
-              </button>
-            ))}
-          </div>
-        </div>
-        <Title title="الـقــارئ" />
-        <div className="flex flex-wrap items-center justify-center gap-2 pb-4 border-b-2 border-green-400">
-          {renderSheikhButtons()}
-        </div>
-
-        {playMode === "surah" && (
-          <div className="mt-4">
-            <Title title="اخـتـــر الــسورة" />
-            <div className="flex flex-wrap justify-center gap-2 mt-2">
-              {availableSurahs.map((surah) => (
-                <button
-                  key={surah.number}
-                  onClick={() => setSelectedSurah(surah)}
-                  className={`${
-                    selectedSurah?.number === surah.number
-                      ? "bg-white text-green-600"
-                      : "bg-green-600 text-white hover:bg-green-500"
-                  } p-2 rounded-lg transition-all duration-200`}
-                >
-                  {surah.name}
-                </button>
-              ))}
+                onPointerDown={(e) => {
+                  controls.start(e);
+                }}
+                className="h-2 w-14 cursor-grab touch-none rounded-full bg-white active:cursor-grabbing"
+              ></button>
             </div>
-          </div>
-        )}
-      </div>
-      <span
-        className={`absolute top-0 left-0 z-20 w-full h-full bg-transparent ${
-          menuOpen ? "visible" : "invisible"
-        }`}
-        onClick={() => setMenuOpen(false)}
-      ></span>
+            <div className="relative z-0 h-full overflow-y-scroll p-4 pt-12">
+              <IoMdCloseCircleOutline
+                className="absolute top-10 right-5 text-white text-3xl hover:scale-110 rotate-45 hover:rotate-180 transition-all duration-300"
+                onClick={handleClose}
+              />
+              <div className="mt-4">
+                <Title title="اختــر وضـع التشغيــل" />
+                <div className="flex flex-wrap justify-center gap-2 mt-2">
+                  {["surah", "page"].map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => setPlayMode(mode)}
+                      className={`${
+                        playMode === mode
+                          ? "bg-white text-green-600"
+                          : "bg-green-600 text-white hover:bg-green-500"
+                      } p-2 rounded-lg transition-all duration-200`}
+                    >
+                      {mode === "surah" ? "ســورة" : "صــفــحــة"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <Title title="الـقــارئ" />
+              <div className="flex flex-wrap items-center justify-center gap-2 pb-4 border-b-2 border-green-400">
+                {renderSheikhButtons()}
+              </div>
+
+              {playMode === "surah" && (
+                <div className="mt-4">
+                  <Title title="اخـتـــر الــسورة" />
+                  <div className="flex flex-wrap justify-center gap-2 mt-2">
+                    {availableSurahs.map((surah) => (
+                      <button
+                        key={surah.number}
+                        onClick={() => setSelectedSurah(surah)}
+                        className={`${
+                          selectedSurah?.number === surah.number
+                            ? "bg-white text-green-600"
+                            : "bg-green-600 text-white hover:bg-green-500"
+                        } p-2 rounded-lg transition-all duration-200`}
+                      >
+                        {surah.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </>
   );
 };
