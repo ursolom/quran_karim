@@ -14,8 +14,7 @@ import sunrise from "../public/audio/sunrise.mp3";
 import QueryProvider from "./provider/Query";
 
 const prayerNames = ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"];
-const adhanUrl =
-  "https://ia600908.us.archive.org/12/items/90---azan---90---azan--many----sound----mp3---alazan/";
+const adhanUrl = "https://ia600908.us.archive.org/12/items/90---azan---90---azan--many----sound----mp3---alazan/";
 
 const adhanSounds = {
   الفجر: `${adhanUrl}035-.mp3`,
@@ -54,9 +53,14 @@ const translatePrayerNameToEnglish = (name) => {
 
 const AppContent = () => {
   const [isMuted, setIsMuted] = useState(false);
+<<<<<<< HEAD
   const [selectedCity, setSelectedCity] = useState(
     localStorage.getItem("selectedCity") || "cairo"
   );
+=======
+  const [prayerTimes, setPrayerTimes] = useState([]);
+  const [selectedCity, setSelectedCity] = useState(localStorage.getItem("selectedCity") || "cairo");
+>>>>>>> ba842bbe3059ed3708b228cd091496392d2dec25
   const [lastNotificationTime, setLastNotificationTime] = useState({});
   const [audioContextInitialized, setAudioContextInitialized] = useState(false);
   const [showMuteButton, setShowMuteButton] = useState(false);
@@ -85,6 +89,38 @@ const AppContent = () => {
     return diff > 60 * 1000;
   };
 
+<<<<<<< HEAD
+=======
+  const fetchPrayerTimes = async (city) => {
+    try {
+      const response = await axios.get(`https://api.aladhan.com/v1/timingsByCity?country=egypt&city=${city}`);
+      const timings = response.data?.data?.timings;
+      if (timings) {
+        setPrayerTimes(
+          prayerNames.map((name) => ({
+            name,
+            time: timings[translatePrayerNameToEnglish(name)],
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching prayer times:", error);
+    }
+  };
+
+  const translatePrayerNameToEnglish = (name) => {
+    const translation = {
+      الفجر: "Fajr",
+      الشروق: "Sunrise",
+      الظهر: "Dhuhr",
+      العصر: "Asr",
+      المغرب: "Maghrib",
+      العشاء: "Isha",
+    };
+    return translation[name];
+  };
+
+>>>>>>> ba842bbe3059ed3708b228cd091496392d2dec25
   useEffect(() => {
     if (Notification.permission !== "granted") {
       Notification.requestPermission();
@@ -93,9 +129,7 @@ const AppContent = () => {
     const initializeAudioContext = () => {
       if (!audioContextInitialized) {
         setAudioContextInitialized(true);
-        const silentAudio = new Audio(
-          "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA="
-        );
+        const silentAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA=");
         silentAudio.play().catch((error) => {
           console.error("Failed to initialize audio context:", error);
         });
