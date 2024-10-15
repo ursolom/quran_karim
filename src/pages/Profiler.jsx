@@ -74,7 +74,7 @@ export default function Profiler() {
               ))}
             </div>
           </div>
-          <div className="text-center my-5">دمتم بخير وتقبل الله مـنــا ومــنــكــم</div>
+          <div className="text-center my-5">دمتم بخير وتقبل الله مـنــا ومـنــكــم</div>
         </div>
       </div>
     </>

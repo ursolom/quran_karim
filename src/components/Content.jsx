@@ -10,7 +10,6 @@ import { BsFillBookmarkPlusFill } from "react-icons/bs";
 import { FiMenu, FiX } from "react-icons/fi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import LoadingAnimation from "./LoadingAnimation";
 
 export default function Content({
   toggleContent,
@@ -19,7 +18,6 @@ export default function Content({
   currentPage,
   onSaveBookmark,
 }) {
-  const [isLoading, setIsLoading] = useState(true);
   const [loadedImages, setLoadedImages] = useState([]);
   const [savedPage, setSavedPage] = useState(null);
   const [imageSourceIndex, setImageSourceIndex] = useState(0);
@@ -68,12 +66,6 @@ export default function Content({
     setLoadedImages((prevLoadedImages) => [
       ...new Set([...prevLoadedImages, ...newLoadedImages]),
     ]);
-  };
-
-  const handleImageLoad = (index) => {
-    if (index === loadedImages[loadedImages.length - 1]) {
-      setIsLoading(false);
-    }
   };
 
   useEffect(() => {
@@ -237,21 +229,20 @@ export default function Content({
       dir="rtl"
     >
       <ToastContainer />
-      {isLoading && <LoadingAnimation />}
       {showSavedPageIndicator && (
         <div
           ref={bookmarkRef}
-          className="absolute w-12 h-1 top-0 left-0 z-10 select-none"
+          className="absolute top-0 left-0 z-10 w-12 h-1 select-none"
         >
           <img
             src={bookMarkImage}
             alt="bookMark"
-            className="size-full h-full"
+            className="h-full size-full"
           />
         </div>
       )}
       <Swiper
-        className="size-full flex justify-center items-center select-none transition-all duration-75"
+        className="flex items-center justify-center transition-all duration-75 select-none size-full"
         style={{ backgroundColor }}
         spaceBetween={50}
         onSlideChange={handleSlideChange}
@@ -278,12 +269,11 @@ export default function Content({
             {loadedImages.includes(index) ? (
               <img
                 src={getImageUrl(index + 1)}
-                className="size-full md:object-contain  select-none"
+                className="select-none size-full md:object-contain"
                 alt={`Slide ${index + 1}`}
-                onLoad={() => handleImageLoad(index)}
               />
             ) : (
-              <div className="size-full flex justify-center items-center bg-white">
+              <div className="flex items-center justify-center bg-white size-full">
                 <div className="loader"></div>
               </div>
             )}
@@ -292,7 +282,7 @@ export default function Content({
       </Swiper>
       {isSidebarOpen && (
         <span
-          className="absolute size-full bg-transparent z-40"
+          className="absolute z-40 bg-transparent size-full"
           onClick={toggleSidebar}
         ></span>
       )}
@@ -317,7 +307,7 @@ export default function Content({
           />
           <button
             onClick={handleSaveColorChange}
-            className="p-2 bg-green-600 m-3 text-white hover:bg-green-500 transition-all duration-100 rounded-lg"
+            className="p-2 m-3 text-white transition-all duration-100 bg-green-600 rounded-lg hover:bg-green-500"
           >
             حفظ التغيير
           </button>
@@ -331,7 +321,7 @@ export default function Content({
           {savedPage === currentPage ? "تم حفظ العلامة" : "حفظ علامة"}
           <BsFillBookmarkPlusFill className="mr-2" />
         </button>
-        <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {imageSources.map((source, index) => (
             <button
               key={index}

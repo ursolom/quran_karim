@@ -90,7 +90,7 @@ const Search = ({ onVerseClick, onHide }) => {
 
   return (
     <div className="flex flex-col" dir="rtl">
-      <header className="w-full bg-green-600 h-64 py-6 flex justify-center px-11 fixed z-10">
+      <header className="fixed z-10 flex justify-center w-full h-64 py-6 bg-green-600 px-11">
         <div className="w-full">
           <div className="flex items-center">
             <input
@@ -101,25 +101,25 @@ const Search = ({ onVerseClick, onHide }) => {
               value={searchTerm}
               onChange={handleInputChange}
             />
-            <CiSearch className="text-white size-9 left-11 relative -z-10" />
+            <CiSearch className="relative text-white size-9 left-11 -z-10" />
           </div>
         </div>
         <button
-          className="absolute top-0 left-0 text-white p-1 m-3 hover:ml-2 transition-all duration-200"
+          className="absolute top-0 left-0 p-1 m-3 text-white transition-all duration-200 hover:ml-2"
           onClick={handleBackClick}
         >
           <TiArrowBack className="size-12" />
         </button>
       </header>
       <div className="relative top-44 flex flex-col md:text-[25px] text-[16px] text-black">
-        <div className="w-full bg-white flex justify-between items-center py-10 px-5 rounded-t-3xl fixed z-10">
+        <div className="fixed z-10 flex items-center justify-between w-full px-5 py-10 bg-white rounded-t-3xl">
           {!isInputValid && (
             <div className="md:text-[25px] text-[15px] mb-3 w-full">
               يرجى إدخال ثلاثة أحرف على الأقل للبحث
             </div>
           )}
           {!isLoading && searchTerm && (
-            <div className="w-full flex justify-between items-center">
+            <div className="flex items-center justify-between w-full">
               <div>عدد ظهور الكلمة</div>
               <div>&quot;{searchTerm}&quot;</div>
               <div>{totalOccurrences}</div>
@@ -127,8 +127,8 @@ const Search = ({ onVerseClick, onHide }) => {
           )}
         </div>
         {isLoading && (
-          <div className="flex flex-col gap-5 py-5 px-3 border-b-2">
-            <div className="bg-gray-600 h-4 w-full rounded-md animate-pulse" />
+          <div className="flex flex-col gap-5 px-3 py-5 border-b-2">
+            <div className="w-full h-4 bg-gray-600 rounded-md animate-pulse" />
           </div>
         )}
         <div ref={resultsContainerRef}>
@@ -137,7 +137,7 @@ const Search = ({ onVerseClick, onHide }) => {
             return (
               <div
                 key={index}
-                className="top-24 bg-white relative py-5 md:px-7 flex flex-col gap-5 px-3 border-b-2 hover:bg-blue-200 active:scale-90 transition duration-100"
+                className="relative flex flex-col gap-5 px-3 py-5 transition duration-100 bg-white border-b-2 top-24 md:px-7 hover:bg-blue-200 active:scale-90"
                 onClick={() =>
                   handleVerseClick(verse.surah_number, verse.verse_number)
                 }
@@ -145,7 +145,7 @@ const Search = ({ onVerseClick, onHide }) => {
                 <div className="md:text-[25px] text-[15px]">
                   {verse.content}
                 </div>
-                <div className="flex justify-between items-center text-slate-600">
+                <div className="flex items-center justify-between text-slate-600">
                   <div>
                     <div>
                       سورة
@@ -156,7 +156,7 @@ const Search = ({ onVerseClick, onHide }) => {
                       }
                     </div>
                   </div>
-                  <div className="flex gap-7 items-center">
+                  <div className="flex items-center gap-7">
                     <div>صفحة : {page}</div>
                     <div>اية : {verse.verse_number}</div>
                   </div>

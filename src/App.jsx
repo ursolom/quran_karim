@@ -1,15 +1,17 @@
 import { useEffect, useState, useRef } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useQuery } from "react-query";
+import axios from "axios";
 import Home from "./pages/Home";
 import Prayer from "./pages/Prayer";
 import Profiler from "./pages/Profiler";
+// import NotFound from "./pages/NotFound";
 import { AiFillSound } from "react-icons/ai";
 import { FaVolumeMute } from "react-icons/fa";
-import axios from "axios";
+import { parse, isSameMinute, addMinutes, subMinutes } from "date-fns";
 import notification from "../public/audio/notification.mp3";
 import sunrise from "../public/audio/sunrise.mp3";
-import NotFond from "./pages/NotFond";
-import { parse, isSameMinute, addMinutes, subMinutes } from "date-fns";
+import QueryProvider from "./provider/Query";
 
 const prayerNames = ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"];
 const adhanUrl =
@@ -24,9 +26,34 @@ const adhanSounds = {
   الشروق: sunrise,
 };
 
-const App = () => {
+const fetchPrayerTimes = async (city) => {
+  const response = await axios.get(
+    `https://api.aladhan.com/v1/timingsByCity?country=egypt&city=${city}`
+  );
+  const timings = response.data?.data?.timings;
+  if (timings) {
+    return prayerNames.map((name) => ({
+      name,
+      time: timings[translatePrayerNameToEnglish(name)],
+    }));
+  }
+  throw new Error("Failed to fetch prayer times");
+};
+
+const translatePrayerNameToEnglish = (name) => {
+  const translation = {
+    الفجر: "Fajr",
+    الشروق: "Sunrise",
+    الظهر: "Dhuhr",
+    العصر: "Asr",
+    المغرب: "Maghrib",
+    العشاء: "Isha",
+  };
+  return translation[name];
+};
+
+const AppContent = () => {
   const [isMuted, setIsMuted] = useState(false);
-  const [prayerTimes, setPrayerTimes] = useState([]);
   const [selectedCity, setSelectedCity] = useState(
     localStorage.getItem("selectedCity") || "cairo"
   );
@@ -36,6 +63,15 @@ const App = () => {
 
   const audioRef = useRef(new Audio());
   const afterPrayerAudioRef = useRef(new Audio(notification));
+
+  const { data: prayerTimes, refetch: refetchPrayerTimes } = useQuery(
+    ["prayerTimes", selectedCity],
+    () => fetchPrayerTimes(selectedCity),
+    {
+      refetchOnWindowFocus: false,
+      refetchInterval: 24 * 60 * 60 * 1000, // Refetch every 24 hours
+    }
+  );
 
   const toggleMute = () => {
     setIsMuted(!isMuted);
@@ -47,37 +83,6 @@ const App = () => {
     if (!lastNotification) return true;
     const diff = now - new Date(lastNotification);
     return diff > 60 * 1000;
-  };
-
-  const fetchPrayerTimes = async (city) => {
-    try {
-      const response = await axios.get(
-        `https://api.aladhan.com/v1/timingsByCity?country=egypt&city=${city}`
-      );
-      const timings = response.data?.data?.timings;
-      if (timings) {
-        setPrayerTimes(
-          prayerNames.map((name) => ({
-            name,
-            time: timings[translatePrayerNameToEnglish(name)],
-          }))
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching prayer times:", error);
-    }
-  };
-
-  const translatePrayerNameToEnglish = (name) => {
-    const translation = {
-      الفجر: "Fajr",
-      الشروق: "Sunrise",
-      الظهر: "Dhuhr",
-      العصر: "Asr",
-      المغرب: "Maghrib",
-      العشاء: "Isha",
-    };
-    return translation[name];
   };
 
   useEffect(() => {
@@ -111,11 +116,9 @@ const App = () => {
   }, [audioContextInitialized]);
 
   useEffect(() => {
-    fetchPrayerTimes(selectedCity);
-  }, [selectedCity]);
-
-  useEffect(() => {
     const checkPrayerTime = () => {
+      if (!prayerTimes) return;
+
       const now = new Date();
 
       prayerTimes.forEach((prayer) => {
@@ -134,9 +137,9 @@ const App = () => {
               setShowMuteButton(true);
             }
 
-            if (!isMuted && audioSrc) {
-              const audio = new Audio(audioSrc);
-              audio.play().catch((error) => {
+            if (!isMuted && audioSrc && audioRef.current.paused) {
+              audioRef.current.src = audioSrc;
+              audioRef.current.play().catch((error) => {
                 console.error(`Failed to play notification audio: ${error}`);
               });
             }
@@ -166,15 +169,6 @@ const App = () => {
             "adhan",
             adhanSounds[prayer.name]
           );
-
-          if (!isMuted && adhanSounds[prayer.name]) {
-            audioRef.current.src = adhanSounds[prayer.name];
-            audioRef.current.play().catch((error) => {
-              console.error(`Failed to play Adhan audio: ${error}`);
-            });
-
-            // لا يتم إيقاف الصوت هنا للسماح له باللعب بالكامل
-          }
         }
 
         let minutesAfterPrayer;
@@ -197,7 +191,7 @@ const App = () => {
             notification
           );
 
-          if (!isMuted) {
+          if (!isMuted && afterPrayerAudioRef.current.paused) {
             afterPrayerAudioRef.current.src = notification;
             afterPrayerAudioRef.current.play().catch((error) => {
               console.error(`Failed to play after prayer audio: ${error}`);
@@ -236,7 +230,7 @@ const App = () => {
     const city = event.target.value;
     setSelectedCity(city);
     localStorage.setItem("selectedCity", city);
-    fetchPrayerTimes(city);
+    refetchPrayerTimes();
   };
 
   return (
@@ -255,7 +249,7 @@ const App = () => {
             }
           />
           <Route path="/profile" element={<Profiler />} />
-          <Route path="*" element={<NotFond />} />
+          {/* <Route path="*" element={<NotFound />} /> */}
         </Routes>
         {showMuteButton && (
           <button
@@ -272,6 +266,14 @@ const App = () => {
         )}
       </div>
     </Router>
+  );
+};
+
+const App = () => {
+  return (
+    <QueryProvider>
+      <AppContent />
+    </QueryProvider>
   );
 };
 

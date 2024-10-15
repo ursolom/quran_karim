@@ -1,10 +1,10 @@
 
-import { useState, useEffect, useRef, useCallback, lazy, Suspense } from "react";
-import { gsap } from "gsap";
+import { useState,  useCallback, lazy, Suspense } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Content from "../components/Content";
-import LoadingAnimation from "../components/LoadingAnimation"; // استيراد مكون التحميل المخصص
+import LoadingAnimation from "../components/LoadingAnimation";
 
 const Fahras = lazy(() => import("../components/Fahras"));
 const Search = lazy(() => import("../components/Search"));
@@ -15,11 +15,6 @@ export default function Home() {
   const [isBookmarkSaved, setIsBookmarkSaved] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isFahrasVisible, setIsFahrasVisible] = useState(false);
-
-  const headerRef = useRef(null);
-  const footerRef = useRef(null);
-  const fahrasRef = useRef(null);
-  const searchComponentRef = useRef(null);
 
   const toggleContent = useCallback(() => {
     setIsContentActive((prev) => !prev);
@@ -60,84 +55,74 @@ export default function Home() {
     setTimeout(() => setIsBookmarkSaved(false), 2000);
   }, [currentPage]);
 
-  useEffect(() => {
-    const tl = gsap.timeline({ defaults: { duration: 0.5, ease: "power2.inOut" } });
-    if (headerRef.current && footerRef.current) {
-      tl.fromTo(
-        headerRef.current,
-        { right: "0" },
-        { right: isContentActive ? "-100%" : "0" }
-      )
-      .fromTo(
-        footerRef.current,
-        { right: "0" },
-        { right: isContentActive ? "-100%" : "0" },
-        0 
-      );
-    }
-  }, [isContentActive]);
+  const headerVariants = {
+    visible: { right: 0 },
+    hidden: { right: "-100%" },
+  };
 
-  useEffect(() => {
-    if (fahrasRef.current) {
-      gsap.fromTo(
-        fahrasRef.current,
-        { left: "100%" },
-        {
-          left: isFahrasVisible ? "0" : "-100%",
-          duration: 0.5,
-          ease: "power2.inOut",
-        }
-      );
-    }
-  }, [isFahrasVisible]);
+  const footerVariants = {
+    visible: { right: 0 },
+    hidden: { right: "-100%" },
+  };
 
-  useEffect(() => {
-    if (searchComponentRef.current) {
-      gsap.fromTo(
-        searchComponentRef.current,
-        { left: "100%" },
-        {
-          left: isSearchVisible ? "0" : "-100%",
-          duration: 0.5,
-          ease: "power2.inOut",
-        }
-      );
-    }
-  }, [isSearchVisible]);
+  const fahrasVariants = {
+    visible: { left: 0 },
+    hidden: { left: "-100%" },
+  };
+
+  const searchVariants = {
+    visible: { left: 0 },
+    hidden: { left: "-100%" },
+  };
 
   return (
     <>
-      {isFahrasVisible && (
-        <div className="w-full absolute h-full overflow-x-hidden">
-          <div
-            ref={fahrasRef}
-            className="w-full h-full absolute left-[-100%] top-0 bg-white z-50 transition-all duration-500"
+      <AnimatePresence>
+        {isFahrasVisible && (
+          <motion.div
+            className="absolute w-full h-full overflow-x-hidden"
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={fahrasVariants}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+          >
+            <div className="absolute top-0 z-50 w-full h-full bg-white">
+              <Suspense fallback={<LoadingAnimation />}>
+                <Fahras onSurahClick={handleSurahClick} onGoBack={hideFahras} />
+              </Suspense>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isSearchVisible && (
+          <motion.div
+            className="absolute top-0 z-50 w-full h-full bg-white"
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={searchVariants}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
           >
             <Suspense fallback={<LoadingAnimation />}>
-              <Fahras onSurahClick={handleSurahClick} onGoBack={hideFahras} />
+              <Search onVerseClick={handlePageChange} onHide={hideSearch} />
             </Suspense>
-          </div>
-        </div>
-      )}
-      {isSearchVisible && (
-        <div
-          ref={searchComponentRef}
-          className="w-full h-full absolute left-[-100%] top-0 bg-white z-50 transition-all duration-500"
-        >
-          <Suspense fallback={<LoadingAnimation />}>
-            <Search onVerseClick={handlePageChange} onHide={hideSearch} />
-          </Suspense>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="w-[100%] h-[100vh] overflow-hidden absolute">
-        <div
-          ref={headerRef}
+        <motion.div
           style={{
             position: "absolute",
             top: 0,
             width: "100%",
             height: "100vh",
           }}
+          initial="visible"
+          animate={isContentActive ? "hidden" : "visible"}
+          variants={headerVariants}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
         >
           {!isBookmarkSaved && (
             <Header
@@ -149,7 +134,7 @@ export default function Home() {
               toggleSearchVisibility={toggleSearchVisibility}
             />
           )}
-        </div>
+        </motion.div>
       </div>
       <Content
         isContentActive={isContentActive}
@@ -160,14 +145,17 @@ export default function Home() {
         onSaveBookmark={handleSaveBookmark}
       />
       <div className="w-[100%] h-[100vh] right-0 bottom-0 overflow-x-hidden absolute">
-        <div
-          ref={footerRef}
+        <motion.div
           style={{
             position: "absolute",
             bottom: 0,
             width: "100%",
             height: "100vh",
           }}
+          initial="visible"
+          animate={isContentActive ? "hidden" : "visible"}
+          variants={footerVariants}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
         >
           {!isBookmarkSaved && (
             <Footer
@@ -176,7 +164,7 @@ export default function Home() {
               onPageChange={handlePageChange}
             />
           )}
-        </div>
+        </motion.div>
       </div>
     </>
   );
