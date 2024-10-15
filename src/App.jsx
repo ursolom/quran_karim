@@ -68,7 +68,7 @@ const AppContent = () => {
     () => fetchPrayerTimes(selectedCity),
     {
       refetchOnWindowFocus: false,
-      refetchInterval: 24 * 60 * 60 * 1000, // Refetch every 24 hours
+      refetchInterval: 24 * 60 * 60 * 1000, 
     }
   );
 
