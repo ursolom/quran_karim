@@ -66,9 +66,9 @@ export default function Footer({ isContentActive, currentPage, onPageChange }) {
 
   useEffect(() => {
     if (selectedSurah && playMode === "surah" && !isPaused) {
-      updateAudioSource(selectedSheikh.audioSource, selectedSurah.number);
+      updateAudioSource(selectedSheikh.audioSource, selectedSheikh.zero, selectedSurah.number);
     } else if (playMode === "page" && !isPaused) {
-      updateAudioSource(selectedSheikhPage.audioSource, currentPage);
+      updateAudioSource(selectedSheikhPage.audioSource, selectedSheikhPage.zero, currentPage);
     }
   }, [
     selectedSurah,
@@ -87,10 +87,9 @@ export default function Footer({ isContentActive, currentPage, onPageChange }) {
     }
   }, [audioRef.current?.src]);
 
-  const updateAudioSource = (source, identifier) => {
-    const audioSource = `${source}${identifier
-      .toString()
-      .padStart(3, "0")}.mp3`;
+  const updateAudioSource = (source, zero, identifier) => {
+    const formattedIdentifier = zero ? identifier.toString().padStart(3, "0") : identifier;
+    const audioSource = `${source}${formattedIdentifier}.mp3`;
     if (audioRef.current && !isPlaying) {
       audioRef.current.src = audioSource;
       audioRef.current.playbackRate = audioSpeed;
@@ -140,14 +139,9 @@ export default function Footer({ isContentActive, currentPage, onPageChange }) {
   const stopAudio = (e) => {
     e.preventDefault();
     resetAudio();
-    const audioSource =
-      playMode === "surah"
-        ? `${selectedSheikh.audioSource}${selectedSurah.number
-            .toString()
-            .padStart(3, "0")}.mp3`
-        : `${selectedSheikhPage.audioSource}${currentPage
-            .toString()
-            .padStart(3, "0")}.mp3`;
+    const audioSource = playMode === "surah"
+      ? `${selectedSheikh.audioSource}${selectedSheikh.zero ? selectedSurah.number.toString().padStart(3, "0") : selectedSurah.number}.mp3`
+      : `${selectedSheikhPage.audioSource}${selectedSheikhPage.zero ? currentPage.toString().padStart(3, "0") : currentPage}.mp3`;
 
     if (audioSource) {
       audioRef.current.src = audioSource;
