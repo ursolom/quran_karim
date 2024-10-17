@@ -17,11 +17,11 @@ const prayerNames = ["الفجر", "الشروق", "الظهر", "العصر", "
 const adhanUrl = "https://dl.doaa.top/dl/";
 
 const adhanSounds = {
-  الفجر: `${adhanUrl}1010-.mp3`,
-  الظهر: `${adhanUrl}1027-.mp3`,
-  العصر: `${adhanUrl}1027-.mp3`,
-  المغرب: `${adhanUrl}1027-.mp3`,
-  العشاء: `${adhanUrl}1027-.mp3`,
+  الفجر: `${adhanUrl}1010.mp3`,
+  الظهر: `${adhanUrl}1027.mp3`,
+  العصر: `${adhanUrl}1027.mp3`,
+  المغرب: `${adhanUrl}1027.mp3`,
+  العشاء: `${adhanUrl}1027.mp3`,
   الشروق: sunrise,
 };
 
