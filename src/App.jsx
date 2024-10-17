@@ -5,7 +5,7 @@ import axios from "axios";
 import Home from "./pages/Home";
 import Prayer from "./pages/Prayer";
 import Profiler from "./pages/Profiler";
-// import NotFound from "./pages/NotFound";
+import NotFound from "./pages/NotFond";
 import { AiFillSound } from "react-icons/ai";
 import { FaVolumeMute } from "react-icons/fa";
 import { parse, isSameMinute, addMinutes, subMinutes } from "date-fns";
@@ -14,7 +14,7 @@ import sunrise from "../public/audio/sunrise.mp3";
 import QueryProvider from "./provider/Query";
 
 const prayerNames = ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"];
-const adhanUrl = "https://dl.doaa.top/dl/1027.mp3";
+const adhanUrl = "https://dl.doaa.top/dl/";
 
 const adhanSounds = {
   الفجر: `${adhanUrl}1010-.mp3`,
@@ -248,7 +248,7 @@ const AppContent = () => {
             }
           />
           <Route path="/profile" element={<Profiler />} />
-          {/* <Route path="*" element={<NotFound />} /> */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
         {showMuteButton && (
           <button
