@@ -14,14 +14,14 @@ import sunrise from "../public/audio/sunrise.mp3";
 import QueryProvider from "./provider/Query";
 
 const prayerNames = ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"];
-const adhanUrl = "https://ia600908.us.archive.org/12/items/90---azan---90---azan--many----sound----mp3---alazan/";
+const adhanUrl = "https://dl.doaa.top/dl/1027.mp3";
 
 const adhanSounds = {
-  الفجر: `${adhanUrl}035-.mp3`,
-  الظهر: `${adhanUrl}052-.mp3`,
-  العصر: `${adhanUrl}052-.mp3`,
-  المغرب: `${adhanUrl}052-.mp3`,
-  العشاء: `${adhanUrl}052-.mp3`,
+  الفجر: `${adhanUrl}1010-.mp3`,
+  الظهر: `${adhanUrl}1027-.mp3`,
+  العصر: `${adhanUrl}1027-.mp3`,
+  المغرب: `${adhanUrl}1027-.mp3`,
+  العشاء: `${adhanUrl}1027-.mp3`,
   الشروق: sunrise,
 };
 
@@ -68,7 +68,7 @@ const AppContent = () => {
     () => fetchPrayerTimes(selectedCity),
     {
       refetchOnWindowFocus: false,
-      refetchInterval: 24 * 60 * 60 * 1000, 
+      refetchInterval: 24 * 60 * 60 * 1000,
     }
   );
 
@@ -92,7 +92,9 @@ const AppContent = () => {
     const initializeAudioContext = () => {
       if (!audioContextInitialized) {
         setAudioContextInitialized(true);
-        const silentAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA=");
+        const silentAudio = new Audio(
+          "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA="
+        );
         silentAudio.play().catch((error) => {
           console.error("Failed to initialize audio context:", error);
         });

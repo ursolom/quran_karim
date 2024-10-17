@@ -13,55 +13,62 @@ const SheikhsPage = [
     id: 1,
     name: "مشاري العفاسي ",
     img: Al_Afasy,
-    audioSource: "https://ia804505.us.archive.org/15/items/mshary-al3afasy-by-qasr-almonfasel-604-page-quran-mp3-128kb_21/",
+    audioSource: "https://server8.mp3quran.net/afs/",
   },
   {
     id: 2,
     name: "محمد صديق المنشاوي",
     img: Elminshwey,
-    audioSource: "https://ia600902.us.archive.org/13/items/32--kb----mp3---alminshawy---moratal---md--almonfasel------quran---safa7at----/",
+    audioSource:
+      "https://everyayah.com/data/Minshawy_Murattal_128kbps/PageMp3s/Page",
   },
   {
     id: 3,
     name: "ياسر الدوسري",
     img: Dosari,
-    audioSource: "https://ia804706.us.archive.org/14/items/64kb--yaser--aldosry---quran--mp3---604--part---full/",
+    audioSource:
+      "https://ia804706.us.archive.org/14/items/64kb--yaser--aldosry---quran--mp3---604--part---full/",
   },
   {
     id: 4,
     name: "علي جابر",
     img: Ali_Jaber,
-    audioSource: "https://ia902902.us.archive.org/25/items/Islamic_Tape-406_uP_bY_mUSLEm/P_",
+    audioSource:
+      "https://ia902902.us.archive.org/25/items/Islamic_Tape-406_uP_bY_mUSLEm/P_",
   },
   {
     id: 5,
     name: "محمود خليل الحصري",
     img: Hosary,
-    audioSource: "https://ia803406.us.archive.org/6/items/32----kb----mp3---alhosary---moratal---md--almonfasel------quran---safa7at----/Page",
+    audioSource: "https://everyayah.com/data/Husary_128kbps/PageMp3s/Page",
   },
   {
     id: 6,
     name: "محمود علي البنا ",
     img: Banna,
-    audioSource: "https://ia904507.us.archive.org/9/items/32-kb----mp3---albana--moratal---qasr-almonfasel------quran---safa7at-----604-/Page",
+    audioSource:
+      "https://ia904507.us.archive.org/9/items/32-kb----mp3---albana--moratal---qasr-almonfasel------quran---safa7at-----604-/Page",
   },
   {
     id: 7,
     name: "ناصر القطامي",
     img: Nasser,
-    audioSource: "https://ia802906.us.archive.org/7/items/604--part-quran-128kb-high-quality-604-part-by-naser-alqattami--mp3/",
+    audioSource:
+      "https://ia802906.us.archive.org/7/items/604--part-quran-128kb-high-quality-604-part-by-naser-alqattami--mp3/",
   },
   {
     id: 8,
     name: "عبدالباسط عبدالصمد",
     img: Abd_El_Basset,
-    audioSource: "https://ia802901.us.archive.org/7/items/Quran--abd-albasit-mogawwad-604-part---full/",
+    audioSource:
+      "https://ia802901.us.archive.org/7/items/Quran--abd-albasit-mogawwad-604-part---full/",
   },
   {
     id: 9,
     name: "محمد الطبلاوي",
     img: Tablawi,
-    audioSource: "https://ia902808.us.archive.org/10/items/64---kb----mp3---altablawy--moratal---md--almonfasel------quran---safa7at-----/Page",
+    audioSource:
+      "https://ia902808.us.archive.org/10/items/64---kb----mp3---altablawy--moratal---md--almonfasel------quran---safa7at-----/Page",
   },
 ];
 

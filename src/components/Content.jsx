@@ -176,7 +176,7 @@ export default function Content({
   const getImageUrl = (index) => {
     const source = imageSources[imageSourceIndex];
     let imageUrl = `${source.baseUrl}${index}${source.extension}`;
-    if (source.baseUrl.includes("surahquran.com")) {
+    if (source.getZero) {
       imageUrl = `${source.baseUrl}${index.toString().padStart(3, "0")}${
         source.extension
       }`;
