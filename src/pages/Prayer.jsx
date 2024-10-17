@@ -9,7 +9,6 @@ import { Link } from "react-router-dom";
 import { TiArrowBack } from "react-icons/ti";
 import cityData from "../data/City";
 import Mosque from "../../public/img_site/Prayer/bg_mosque.jpg";
-const defaultCity = localStorage.getItem("selectedCity") || "cairo";
 
 const prayerIcons = {
   الفجر: <BsMoonStarsFill />,
@@ -39,9 +38,9 @@ const prayerIconColors = {
 };
 
 const Prayer = ({ prayerTimes, selectedCity, onCityChange }) => {
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [nextPrayer, setNextPrayer] = useState(null);
   const [timeLeft, setTimeLeft] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const formatTime = (time24) => {
     const [hour24, minute] = time24.split(":").map(Number);
@@ -99,14 +98,24 @@ const Prayer = ({ prayerTimes, selectedCity, onCityChange }) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTime(new Date());
       updateNextPrayer();
     }, 1000);
 
-    updateNextPrayer();
+    if (prayerTimes && prayerTimes.length > 0) {
+      setIsLoading(false);
+      updateNextPrayer();
+    }
 
     return () => clearInterval(interval);
   }, [prayerTimes]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-emerald-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="prayer-container md:text-[25px] text-[15px] overflow-hidden">
@@ -142,10 +151,8 @@ const Prayer = ({ prayerTimes, selectedCity, onCityChange }) => {
           <p>مـصــر</p>
           <p>-</p>
           <p>
-            {
-              cityData[0]?.cityes.find((city) => city.apiName === selectedCity)
-                ?.displayName
-            }
+            {cityData[0]?.cityes?.find((city) => city.apiName === selectedCity)
+              ?.displayName || "City not found"}
           </p>
         </div>
       </div>
@@ -168,21 +175,38 @@ const Prayer = ({ prayerTimes, selectedCity, onCityChange }) => {
           ))}
         </select>
         <div className="grid md:grid-cols-3 grid-cols-1 md:gap-7 gap-1 md:p-3 p-1 gap-y-3 ">
-          {prayerTimes.map((prayer) => (
-            <div
-              key={prayer.name}
-              className="flex flex-col justify-center items-center p-4 rounded-lg relative shadow-lg bg-gradient-to-r from-teal-200 to-teal-500 "
-            >
-              <span>{prayerNamesArabic[prayer.name]}</span>
-              <span className="prayer-clock">{formatTime(prayer.time)}</span>
-              <span
-                className="absolute top-0 right-5 text-[50px] flex items-center flex-row-reverse w-1/4 h-full"
-                style={{ color: prayerIconColors[prayer.name] }}
-              >
-                {prayerIcons[prayer.name]}
-              </span>
-            </div>
-          ))}
+          {prayerTimes
+            ? prayerTimes.map((prayer) => (
+                <div
+                  key={prayer.name}
+                  className="flex flex-col justify-center items-center p-4 rounded-lg relative shadow-lg bg-gradient-to-r from-teal-200 to-teal-500 "
+                >
+                  <span>{prayerNamesArabic[prayer.name]}</span>
+                  <span className="prayer-clock">
+                    {formatTime(prayer.time)}
+                  </span>
+                  <span
+                    className="absolute top-0 right-5 text-[50px] flex items-center flex-row-reverse w-1/4 h-full"
+                    style={{ color: prayerIconColors[prayer.name] }}
+                  >
+                    {prayerIcons[prayer.name]}
+                  </span>
+                </div>
+              ))
+            : Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col justify-center items-center p-4 rounded-lg relative shadow-lg bg-gradient-to-r from-teal-200 to-teal-500 animate-pulse"
+                >
+                  <span className="text-transparent">تحميل...</span>
+                  <span className="prayer-clock text-transparent">
+                    00:00:00
+                  </span>
+                  <span className="absolute top-0 right-5 text-[50px] flex items-center flex-row-reverse w-1/4 h-full text-transparent">
+                    اسم الصلاة
+                  </span>
+                </div>
+              ))}
         </div>
       </div>
     </div>
