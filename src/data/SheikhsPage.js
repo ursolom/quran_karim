@@ -21,8 +21,8 @@ const SheikhsPage = [
     name: "محمد صديق المنشاوي",
     img: Elminshwey,
     audioSource:
-      "https://www.greattafsirs.com/GreatTafsirsDataPool/Sound/Quran/FullSora/AlMenshawi/s",
-    zero: false,
+      "https://everyayah.com/data/Minshawy_Murattal_128kbps/PageMp3s/Page",
+    zero: true,
   },
   {
     id: 5,
